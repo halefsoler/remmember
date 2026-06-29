@@ -61,6 +61,14 @@
   }
   .add-btn:hover { filter: brightness(1.07); transform: translateY(-1px); }
   .add-btn svg { width: 16px; height: 16px; }
+  .io-btn {
+    align-self: center; font-size: 12.5px; font-weight: 500; color: var(--text-dim);
+    background: var(--bg-elev); border: 1px solid var(--border);
+    padding: 7px 12px; border-radius: 999px; display: inline-flex; align-items: center; gap: 5px;
+    transition: all .14s;
+  }
+  .io-btn:hover { color: var(--text); border-color: var(--border-strong); }
+  .io-btn svg { width: 14px; height: 14px; }
 
   /* Search */
   .searchbar {
@@ -226,6 +234,15 @@
         <h1>remmember<span class="dot">.</span></h1>
         <span class="sub">tudo que você já usou — ou ainda quer usar</span>
         <span class="count-pill" id="countPill">0 itens</span>
+        <button class="io-btn" id="exportBtn" title="Baixar backup JSON">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M7 10l5 5 5-5"/><path d="M12 15V3"/></svg>
+          Exportar
+        </button>
+        <button class="io-btn" id="importBtn" title="Importar backup JSON">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M7 9l5-5 5 5"/><path d="M12 4v12"/></svg>
+          Importar
+        </button>
+        <input type="file" id="importFile" accept="application/json,.json" hidden />
         <button class="add-btn" id="addBtn">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
           Adicionar
@@ -584,6 +601,44 @@ document.querySelectorAll('#statusPicker .status-opt').forEach(b => b.onclick = 
   modalStatus = b.dataset.status; setStatusPicker();
 });
 
+// ---------- export / import ----------
+function exportData() {
+  const blob = new Blob([JSON.stringify(items, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  const stamp = new Date().toISOString().slice(0, 10);
+  a.href = url;
+  a.download = `remmember-backup-${stamp}.json`;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+function importData(file) {
+  const reader = new FileReader();
+  reader.onload = () => {
+    let data;
+    try { data = JSON.parse(reader.result); } catch (e) { alert('Arquivo inválido — não é um JSON válido.'); return; }
+    if (!Array.isArray(data)) { alert('Formato inesperado: o backup deve ser uma lista de itens.'); return; }
+    const seen = new Set(items.map(i => (i.title + '|' + (i.link || '')).toLowerCase()));
+    let added = 0;
+    data.forEach(it => {
+      if (!it || !it.title) return;
+      const key = (it.title + '|' + (it.link || '')).toLowerCase();
+      if (seen.has(key)) return;
+      seen.add(key);
+      items.unshift({
+        id: uid(), created: it.created || Date.now(),
+        cat: it.cat || 'outro', title: it.title, link: it.link || '', logo: it.logo || '',
+        note: it.note || '', tags: Array.isArray(it.tags) ? it.tags : [],
+        status: it.status === 'used' ? 'used' : 'want',
+      });
+      added++;
+    });
+    save(); render();
+    alert(added ? `${added} item(ns) importado(s). Os já existentes foram ignorados.` : 'Nenhum item novo — tudo já estava no seu vault.');
+  };
+  reader.readAsText(file);
+}
+
 // ---------- autocomplete de tags ----------
 function currentTagToken(input) {
   const i = input.value.lastIndexOf(',');
@@ -663,6 +718,12 @@ function saveModal() {
 document.getElementById('search').addEventListener('input', renderGrid);
 document.getElementById('fab').onclick = () => openModal();
 document.getElementById('addBtn').onclick = () => openModal();
+document.getElementById('exportBtn').onclick = exportData;
+document.getElementById('importBtn').onclick = () => document.getElementById('importFile').click();
+document.getElementById('importFile').onchange = (e) => {
+  if (e.target.files[0]) importData(e.target.files[0]);
+  e.target.value = '';
+};
 (() => {
   const fTags = document.getElementById('fTags');
   fTags.addEventListener('input', renderTagSuggest);
