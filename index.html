@@ -1,0 +1,694 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>remmember</title>
+<style>
+  :root {
+    --bg: #0e0f13;
+    --bg-elev: #16181f;
+    --bg-card: #1a1d26;
+    --bg-card-hover: #20242f;
+    --border: #272b36;
+    --border-strong: #343a48;
+    --text: #f2f3f5;
+    --text-dim: #9aa0ad;
+    --text-faint: #646b78;
+    --accent: #FF8A5C;
+    --accent-dim: rgba(255, 138, 92, 0.14);
+    --green: #4ade80;
+    --green-dim: rgba(74, 222, 128, 0.13);
+    --blue: #60a5fa;
+    --radius: 14px;
+    --radius-sm: 9px;
+    --shadow: 0 8px 30px rgba(0,0,0,0.35);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { height: 100%; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    line-height: 1.5;
+    padding-bottom: 80px;
+  }
+  a { color: inherit; }
+  button { font-family: inherit; cursor: pointer; border: none; background: none; color: inherit; }
+  input, textarea, select { font-family: inherit; font-size: 14px; color: var(--text); }
+  ::placeholder { color: var(--text-faint); }
+
+  .wrap { max-width: 1080px; margin: 0 auto; padding: 0 22px; }
+
+  /* Header */
+  header { padding: 42px 0 22px; }
+  .brand { display: flex; align-items: baseline; gap: 12px; }
+  .brand h1 {
+    font-size: 30px; font-weight: 800; letter-spacing: -0.03em;
+  }
+  .brand h1 .dot { color: var(--accent); }
+  .brand .sub { color: var(--text-dim); font-size: 14px; }
+  .count-pill {
+    margin-left: auto; font-size: 12px; color: var(--text-dim);
+    background: var(--bg-elev); border: 1px solid var(--border);
+    padding: 5px 11px; border-radius: 999px; align-self: center;
+  }
+  .add-btn {
+    align-self: center; font-size: 13.5px; font-weight: 600; color: #1a0e08;
+    background: var(--accent); padding: 9px 16px; border-radius: 999px;
+    display: inline-flex; align-items: center; gap: 6px; transition: filter .14s, transform .14s;
+  }
+  .add-btn:hover { filter: brightness(1.07); transform: translateY(-1px); }
+  .add-btn svg { width: 16px; height: 16px; }
+
+  /* Search */
+  .searchbar {
+    position: relative; margin: 22px 0 16px;
+  }
+  .searchbar svg { position: absolute; left: 16px; top: 50%; transform: translateY(-50%); color: var(--text-faint); }
+  .searchbar input {
+    width: 100%; background: var(--bg-elev); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 15px 16px 15px 46px; font-size: 16px;
+    transition: border-color .15s, box-shadow .15s;
+  }
+  .searchbar input:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-dim); }
+
+  /* Filter rows */
+  .filters { display: flex; flex-direction: column; gap: 10px; margin-bottom: 24px; }
+  .filter-row { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+  .filter-label { font-size: 11px; text-transform: uppercase; letter-spacing: .08em; color: var(--text-faint); margin-right: 4px; min-width: 64px; }
+  .chip {
+    font-size: 13px; padding: 6px 13px; border-radius: 999px;
+    background: var(--bg-elev); border: 1px solid var(--border); color: var(--text-dim);
+    transition: all .14s; display: inline-flex; align-items: center; gap: 6px;
+  }
+  .chip:hover { border-color: var(--border-strong); color: var(--text); }
+  .chip.active { background: var(--accent-dim); border-color: var(--accent); color: var(--accent); }
+  .chip.active.green { background: var(--green-dim); border-color: var(--green); color: var(--green); }
+  .chip .ct { font-size: 11px; opacity: .65; }
+
+  /* Cards grid */
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(290px, 1fr)); gap: 16px; }
+  .card {
+    background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius);
+    padding: 18px; display: flex; flex-direction: column; gap: 11px; position: relative;
+    transition: border-color .15s, transform .15s, background .15s;
+    animation: pop .25s ease;
+  }
+  @keyframes pop { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+  .card:hover { border-color: var(--border-strong); background: var(--bg-card-hover); }
+  .card-top { display: flex; align-items: flex-start; gap: 12px; }
+  .card-logo {
+    width: 46px; height: 46px; border-radius: 11px; flex-shrink: 0;
+    display: grid; place-items: center; font-size: 22px; overflow: hidden;
+    background: #fff; border: 1px solid var(--border); position: relative;
+  }
+  .card-logo.fallback { background: var(--bg-elev); }
+  .card-logo .logo-img { width: 100%; height: 100%; object-fit: contain; padding: 7px; }
+  .card-logo .logo-emoji { display: none; }
+  .card-logo.fallback .logo-emoji { display: block; }
+  .card-head { flex: 1; min-width: 0; }
+  .card-title { font-size: 15.5px; font-weight: 650; letter-spacing: -0.01em; line-height: 1.3; word-break: break-word; }
+  .card-title a { text-decoration: none; }
+  .card-title a:hover { color: var(--accent); }
+  .card-domain { font-size: 12px; color: var(--text-faint); margin-top: 2px; word-break: break-all; }
+  .card-note { font-size: 13.5px; color: var(--text-dim); line-height: 1.5; }
+  .card-tags { display: flex; gap: 6px; flex-wrap: wrap; }
+  .tag {
+    font-size: 11.5px; padding: 3px 9px; border-radius: 6px;
+    background: var(--bg-elev); border: 1px solid var(--border); color: var(--text-dim);
+    cursor: pointer; transition: all .12s;
+  }
+  .tag:hover { color: var(--accent); border-color: var(--accent); }
+  .card-foot { display: flex; align-items: center; gap: 8px; margin-top: 2px; padding-top: 11px; border-top: 1px solid var(--border); }
+  .status-badge {
+    font-size: 11.5px; font-weight: 600; padding: 4px 10px; border-radius: 999px;
+    display: inline-flex; align-items: center; gap: 5px; cursor: pointer; transition: all .14s;
+  }
+  .status-badge.used { background: var(--green-dim); color: var(--green); }
+  .status-badge.want { background: var(--accent-dim); color: var(--accent); }
+  .status-badge:hover { filter: brightness(1.2); }
+  .card-actions { margin-left: auto; display: flex; gap: 2px; opacity: 0; transition: opacity .15s; }
+  .card:hover .card-actions { opacity: 1; }
+  .icon-btn { width: 28px; height: 28px; border-radius: 7px; display: grid; place-items: center; color: var(--text-faint); transition: all .12s; }
+  .icon-btn:hover { background: var(--bg-elev); color: var(--text); }
+  .icon-btn.del:hover { color: #f87171; }
+
+  /* Empty state */
+  .empty { text-align: center; padding: 70px 20px; color: var(--text-faint); }
+  .empty .big { font-size: 40px; margin-bottom: 14px; }
+  .empty p { font-size: 14px; }
+
+  /* FAB */
+  .fab {
+    position: fixed; right: 28px; bottom: 28px; z-index: 40;
+    width: 56px; height: 56px; border-radius: 999px;
+    background: var(--accent); color: #1a0e08; display: grid; place-items: center;
+    box-shadow: 0 8px 24px rgba(255,138,92,.4); transition: transform .15s, box-shadow .15s;
+  }
+  .fab:hover { transform: scale(1.06); box-shadow: 0 10px 30px rgba(255,138,92,.5); }
+  .fab svg { width: 26px; height: 26px; }
+
+  /* Modal */
+  .overlay {
+    position: fixed; inset: 0; background: rgba(0,0,0,.6); backdrop-filter: blur(4px);
+    display: none; align-items: center; justify-content: center; z-index: 60; padding: 24px 18px;
+    overflow-y: auto;
+  }
+  .overlay.show { display: flex; }
+  .modal {
+    background: var(--bg-elev); border: 1px solid var(--border-strong); border-radius: 18px;
+    width: 100%; max-width: 480px; padding: 26px; box-shadow: var(--shadow);
+    animation: pop .2s ease; max-height: calc(100vh - 48px); overflow-y: auto;
+  }
+  .modal h2 { font-size: 18px; font-weight: 700; margin-bottom: 20px; letter-spacing: -0.02em; }
+  .field { margin-bottom: 16px; }
+  .field label { display: block; font-size: 12px; color: var(--text-dim); margin-bottom: 7px; font-weight: 500; }
+  .field input, .field textarea, .field select {
+    width: 100%; background: var(--bg-card); border: 1px solid var(--border);
+    border-radius: var(--radius-sm); padding: 11px 13px; transition: border-color .15s, box-shadow .15s;
+  }
+  .field input:focus, .field textarea:focus, .field select:focus {
+    outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-dim);
+  }
+  .field textarea { resize: vertical; min-height: 64px; }
+  .field select { appearance: none; cursor: pointer; }
+  .cat-picker { display: flex; gap: 8px; flex-wrap: wrap; }
+  .cat-opt {
+    flex: 1; min-width: 64px; text-align: center; padding: 11px 6px; border-radius: var(--radius-sm);
+    background: var(--bg-card); border: 1px solid var(--border); transition: all .14s;
+    font-size: 12px; color: var(--text-dim);
+  }
+  .cat-opt .emoji { font-size: 20px; display: block; margin-bottom: 4px; }
+  .cat-opt.active { border-color: var(--accent); background: var(--accent-dim); color: var(--accent); }
+  .status-picker { display: flex; gap: 8px; }
+  .status-opt {
+    flex: 1; text-align: center; padding: 11px; border-radius: var(--radius-sm);
+    background: var(--bg-card); border: 1px solid var(--border); transition: all .14s;
+    font-size: 13px; font-weight: 600; color: var(--text-dim);
+  }
+  .status-opt.active.want { border-color: var(--accent); background: var(--accent-dim); color: var(--accent); }
+  .status-opt.active.used { border-color: var(--green); background: var(--green-dim); color: var(--green); }
+  .modal-actions { display: flex; gap: 10px; margin-top: 24px; }
+  .btn {
+    flex: 1; padding: 12px; border-radius: var(--radius-sm); font-size: 14px; font-weight: 600;
+    transition: all .14s;
+  }
+  .btn-primary { background: var(--accent); color: #1a0e08; }
+  .btn-primary:hover { filter: brightness(1.08); }
+  .btn-ghost { background: var(--bg-card); border: 1px solid var(--border); color: var(--text-dim); }
+  .btn-ghost:hover { color: var(--text); border-color: var(--border-strong); }
+  .hint { font-size: 11.5px; color: var(--text-faint); margin-top: 6px; }
+  .tag-suggest { display: none; flex-wrap: wrap; gap: 6px; margin-top: 9px; }
+  .tag-suggest.show { display: flex; }
+  .tag-suggest .ts-label { font-size: 11px; color: var(--text-faint); width: 100%; margin-bottom: -2px; }
+  .ts-chip {
+    font-size: 12.5px; padding: 5px 11px; border-radius: 7px; cursor: pointer;
+    background: var(--bg-card); border: 1px solid var(--border); color: var(--text-dim);
+    transition: all .12s;
+  }
+  .ts-chip:hover { color: var(--accent); border-color: var(--accent); background: var(--accent-dim); }
+  .ts-chip .ts-ct { opacity: .55; font-size: 11px; }
+
+  @media (max-width: 560px) {
+    header { padding: 28px 0 16px; }
+    .brand { flex-wrap: wrap; }
+    .count-pill { margin-left: 0; }
+    .filter-label { min-width: auto; width: 100%; }
+  }
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div class="brand">
+        <h1>remmember<span class="dot">.</span></h1>
+        <span class="sub">tudo que você já usou — ou ainda quer usar</span>
+        <span class="count-pill" id="countPill">0 itens</span>
+        <button class="add-btn" id="addBtn">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+          Adicionar
+        </button>
+      </div>
+
+      <div class="searchbar">
+        <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
+        <input id="search" type="text" placeholder="Buscar por nome, nota, tag ou link…" autocomplete="off" />
+      </div>
+
+      <div class="filters">
+        <div class="filter-row" id="catFilters"></div>
+        <div class="filter-row" id="tagFilters"></div>
+      </div>
+    </header>
+
+    <div id="grid" class="grid"></div>
+    <div id="empty" class="empty" style="display:none">
+      <div class="big">🗂️</div>
+      <p id="emptyMsg">Nada por aqui ainda. Toque no <b>+</b> pra adicionar.</p>
+    </div>
+  </div>
+
+  <button class="fab" id="fab" title="Adicionar (N)">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+  </button>
+
+  <!-- Modal -->
+  <div class="overlay" id="overlay">
+    <div class="modal">
+      <h2 id="modalTitle">Novo item</h2>
+      <div class="field">
+        <label>Categoria</label>
+        <div class="cat-picker" id="catPicker"></div>
+      </div>
+      <div class="field">
+        <label>Nome / título</label>
+        <input id="fTitle" type="text" placeholder="Ex: PlayPhrase.me" />
+      </div>
+      <div class="field">
+        <label>Link (opcional)</label>
+        <input id="fLink" type="text" placeholder="https://…" />
+        <div class="hint">O logo é puxado automaticamente do site. Deixe o campo abaixo vazio.</div>
+      </div>
+      <div class="field">
+        <label>Logo personalizado (opcional)</label>
+        <input id="fLogo" type="text" placeholder="URL de uma imagem (sobrescreve o favicon)" />
+      </div>
+      <div class="field">
+        <label>Pra que serve / nota</label>
+        <textarea id="fNote" placeholder="Ex: coloco palavras-chave e ele busca trechos de filmes que falam essa frase. Bom pra edição de vídeo."></textarea>
+      </div>
+      <div class="field">
+        <label>Tags <span style="color:var(--text-faint)">(separadas por vírgula)</span></label>
+        <input id="fTags" type="text" placeholder="edição de vídeo, IA, pesquisa" autocomplete="off" />
+        <div class="tag-suggest" id="tagSuggest"></div>
+      </div>
+      <div class="field">
+        <label>Status</label>
+        <div class="status-picker" id="statusPicker">
+          <button class="status-opt want active" data-status="want">⭐ Quero usar</button>
+          <button class="status-opt used" data-status="used">✅ Já usei</button>
+        </div>
+      </div>
+      <div class="modal-actions">
+        <button class="btn btn-ghost" id="cancelBtn">Cancelar</button>
+        <button class="btn btn-primary" id="saveBtn">Salvar</button>
+      </div>
+    </div>
+  </div>
+
+<script>
+const STORE_KEY = 'remmember.items.v1';
+const CATS = {
+  site:  { label: 'Site',  emoji: '🌐' },
+  app:   { label: 'App',   emoji: '📱' },
+  ia:    { label: 'IA',    emoji: '🤖' },
+  livro: { label: 'Livro', emoji: '📚' },
+  filme: { label: 'Filme', emoji: '🎬' },
+  outro: { label: 'Outro', emoji: '✨' },
+};
+
+const SEED = [
+  {"id": "seed-playphrase", "cat": "site", "title": "PlayPhrase.me", "link": "https://www.playphrase.me/#/search?q=&language=en", "note": "Coloco palavras-chave e ele busca trechos de filmes que falam essa frase. Ótimo pra edição de vídeo e achar referências.", "tags": ["edição de vídeo", "pesquisa", "filmes"], "status": "used", "created": 1765000001000},
+  {"id": "tv-00", "cat": "site", "title": "Ahrefs", "link": "https://ahrefs.com/", "note": "All-in-one SEO toolset for growing search traffic and optimizing websites.", "tags": ["Marketing", "SEO"], "status": "want", "created": 1765000000000},
+  {"id": "tv-01", "cat": "site", "title": "Answer The Public", "link": "https://answerthepublic.com/", "note": "Discover what people are asking about any topic online.", "tags": ["Research", "Marketing"], "status": "want", "created": 1764999999999},
+  {"id": "tv-02", "cat": "site", "title": "Bubble", "link": "https://bubble.io", "note": "Build web applications without coding using a visual programming interface.", "tags": ["Webdevelopment"], "status": "want", "created": 1764999999998},
+  {"id": "tv-03", "cat": "site", "title": "Buffer", "link": "https://buffer.com/", "note": "Schedule and manage social media posts across multiple platforms.", "tags": ["Social Media", "Productivity"], "status": "want", "created": 1764999999997},
+  {"id": "tv-04", "cat": "site", "title": "Calendly", "link": "https://calendly.com", "note": "Schedule meetings efficiently by sharing your availability automatically.", "tags": ["Productivity"], "status": "want", "created": 1764999999996},
+  {"id": "tv-05", "cat": "site", "title": "Canva", "link": "https://www.canva.com/", "note": "Create professional designs for social media, presentations, and marketing materials.", "tags": ["Design"], "status": "want", "created": 1764999999995},
+  {"id": "tv-06", "cat": "site", "title": "Capcut", "link": "https://www.capcut.com/", "note": "Edit videos with a feature-rich mobile and desktop video editing tool.", "tags": ["Design"], "status": "want", "created": 1764999999994},
+  {"id": "tv-07", "cat": "ia", "title": "Chat GPT", "link": "https://chat.openai.com/chat", "note": "Generate human-like text responses and assist with various tasks through AI conversation.", "tags": ["A.I.", "Productivity"], "status": "want", "created": 1764999999993},
+  {"id": "tv-08", "cat": "site", "title": "Dropbox", "link": "https://www.dropbox.com", "note": "Store, sync, and share files across devices with cloud storage.", "tags": ["Productivity", "Business"], "status": "want", "created": 1764999999992},
+  {"id": "tv-09", "cat": "site", "title": "Eagle", "link": "https://en.eagle.cool/", "note": "Organize and manage your design assets and inspiration in one place.", "tags": ["Design", "Productivity"], "status": "want", "created": 1764999999991},
+  {"id": "tv-10", "cat": "site", "title": "Figma", "link": "https://figma.com/", "note": "Design, prototype, and collaborate on digital products in the browser.", "tags": ["Design"], "status": "want", "created": 1764999999990},
+  {"id": "tv-11", "cat": "site", "title": "Framer", "link": "https://www.framer.com", "note": "Design and launch websites with a powerful no-code web design platform.", "tags": ["Webdevelopment", "Design"], "status": "want", "created": 1764999999989},
+  {"id": "tv-12", "cat": "site", "title": "Google Analytics", "link": "https://analytics.google.com/analytics/web/", "note": "Track and analyze website traffic and user behavior.", "tags": ["Business", "Research"], "status": "want", "created": 1764999999988},
+  {"id": "tv-13", "cat": "site", "title": "Grammarly", "link": "https://app.grammarly.com", "note": "Edit and correct your grammar, spelling, and punctuation.", "tags": ["Writing", "Productivity"], "status": "want", "created": 1764999999987},
+  {"id": "tv-14", "cat": "site", "title": "Gumroad", "link": "gumroad.com", "note": "Sell digital products directly to your audience with a simple e-commerce platform.", "tags": ["Courses", "Marketing", "Payment"], "status": "want", "created": 1764999999986},
+  {"id": "tv-15", "cat": "ia", "title": "Hemingway", "link": "https://hemingwayapp.com/", "note": "Edit your writing for clarity, simplicity, and readability.", "tags": ["A.I.", "Writing"], "status": "want", "created": 1764999999985},
+  {"id": "tv-16", "cat": "site", "title": "Hotjar", "link": "https://www.hotjar.com", "note": "Understand user behavior with heatmaps, recordings, and feedback tools.", "tags": ["Research", "Business"], "status": "want", "created": 1764999999984},
+  {"id": "tv-17", "cat": "site", "title": "Hypefury", "link": "https://hypefury.com/", "note": "Automate your social media content and grow your audience on X.", "tags": ["Social Media", "Productivity"], "status": "want", "created": 1764999999983},
+  {"id": "tv-18", "cat": "site", "title": "Integrately", "link": "https://integrately.com/", "note": "Automate workflows between apps with a simpler alternative to Zapier.", "tags": ["Business", "Webdevelopment", "Productivity"], "status": "want", "created": 1764999999982},
+  {"id": "tv-19", "cat": "ia", "title": "Jasper", "link": "https://www.jasper.ai/", "note": "Create content faster with AI-powered writing assistance.", "tags": ["A.I.", "Writing"], "status": "want", "created": 1764999999981},
+  {"id": "tv-20", "cat": "site", "title": "Kajabi", "link": "https://kajabi.com", "note": "All-in-one platform for creating, marketing, and selling online courses and digital products.", "tags": ["Business", "Marketing", "Courses"], "status": "want", "created": 1764999999980},
+  {"id": "tv-21", "cat": "site", "title": "Kit", "link": "https://kit.com/", "note": "Creator hub that helps you grow and monetize your audience.", "tags": ["Business", "Marketing"], "status": "want", "created": 1764999999979},
+  {"id": "tv-22", "cat": "site", "title": "Lemonsqueezy", "link": "https://www.lemonsqueezy.com/", "note": "Sell digital products with a simple, modern e-commerce platform for creators.", "tags": ["Business", "Payment", "Marketing"], "status": "want", "created": 1764999999978},
+  {"id": "tv-23", "cat": "site", "title": "Loom", "link": "https://www.loom.com/", "note": "Record and share quick videos of your screen and camera with instant cloud sharing.", "tags": ["Productivity", "Business"], "status": "want", "created": 1764999999977},
+  {"id": "tv-24", "cat": "site", "title": "Mail Brew", "link": "https://mailbrew.com/", "note": "Curate and send email newsletters with insights from your favorite sources.", "tags": ["Marketing", "Productivity"], "status": "want", "created": 1764999999976},
+  {"id": "tv-25", "cat": "site", "title": "Mailerlite", "link": "https://www.mailerlite.com/", "note": "Create, send, and manage email marketing campaigns with a user-friendly interface.", "tags": ["Marketing"], "status": "want", "created": 1764999999975},
+  {"id": "tv-26", "cat": "site", "title": "Make", "link": "https://www.make.com", "note": "Automate workflows and connect apps without coding through a visual automation platform.", "tags": ["Business", "Webdevelopment"], "status": "want", "created": 1764999999974},
+  {"id": "tv-27", "cat": "site", "title": "Notion", "link": "https://www.notion.com/", "note": "Productivity, thought management, project tracking, site building", "tags": ["Writing", "Productivity", "Business"], "status": "want", "created": 1764999999973},
+  {"id": "tv-28", "cat": "site", "title": "Paddle", "link": "https://www.paddle.com", "note": "Handle global payments, tax compliance, and billing for software companies.", "tags": ["Payment", "Business"], "status": "want", "created": 1764999999972},
+  {"id": "tv-29", "cat": "site", "title": "PayPal", "link": "https://www.paypal.com/", "note": "Send and receive money online with the world's most popular digital payment system.", "tags": ["Payment", "Business"], "status": "want", "created": 1764999999971},
+  {"id": "tv-30", "cat": "ia", "title": "Perplexity", "link": "https://www.perplexity.ai/", "note": "Get AI-powered answers and research assistance with cited sources.", "tags": ["A.I."], "status": "want", "created": 1764999999970},
+  {"id": "tv-31", "cat": "site", "title": "Phantom Buster", "link": "https://phantombuster.com", "note": "Automate data extraction and actions on social networks and websites.", "tags": ["Business"], "status": "want", "created": 1764999999969},
+  {"id": "tv-32", "cat": "site", "title": "Podia", "link": "https://www.podia.com", "note": "Host and sell online courses, memberships, and digital downloads from one platform.", "tags": ["Business", "Marketing", "Courses"], "status": "want", "created": 1764999999968},
+  {"id": "tv-33", "cat": "ia", "title": "Poe", "link": "poe.com", "note": "Access multiple AI chatbots and writing assistants in one interface.", "tags": ["A.I."], "status": "want", "created": 1764999999967},
+  {"id": "tv-34", "cat": "ia", "title": "QuilBot", "link": "https://quillbot.com/", "note": "Paraphrase, summarize, and improve your writing with AI-powered tools.", "tags": ["A.I.", "Writing"], "status": "want", "created": 1764999999966},
+  {"id": "tv-35", "cat": "site", "title": "Raindrop", "link": "https://raindrop.io", "note": "Organize and save all your bookmarks, articles, and web content in one place.", "tags": ["Productivity"], "status": "want", "created": 1764999999965},
+  {"id": "tv-36", "cat": "ia", "title": "Rytr", "link": "https://rytr.me", "note": "Generate high-quality content using AI-powered writing assistance.", "tags": ["A.I.", "Writing"], "status": "want", "created": 1764999999964},
+  {"id": "tv-37", "cat": "site", "title": "SEMrush", "link": "https://www.semrush.com/", "note": "Analyze competitors, research keywords, and improve your online marketing strategy.", "tags": ["SEO", "Marketing", "Business", "Research"], "status": "want", "created": 1764999999963},
+  {"id": "tv-38", "cat": "site", "title": "Senja", "link": "https://www.senja.io", "note": "Collect, manage, and showcase customer testimonials and reviews in one central platform.", "tags": ["Business", "Marketing"], "status": "want", "created": 1764999999962},
+  {"id": "tv-39", "cat": "site", "title": "Shopify", "link": "https://www.shopify.com/", "note": "Create and manage your online store with a complete e-commerce platform.", "tags": ["Business", "Marketing"], "status": "want", "created": 1764999999961},
+  {"id": "tv-40", "cat": "site", "title": "Spark", "link": "https://sparkmailapp.com", "note": "Smart email client that helps you organize and manage your inbox efficiently.", "tags": ["Productivity"], "status": "want", "created": 1764999999960},
+  {"id": "tv-41", "cat": "site", "title": "Stripe", "link": "https://stripe.com", "note": "Process online payments and manage financial transactions for your business.", "tags": ["Business", "Payment"], "status": "want", "created": 1764999999959},
+  {"id": "tv-42", "cat": "site", "title": "Tailwind", "link": "https://www.tailwindapp.com", "note": "Design and build responsive websites quickly using utility-first CSS framework.", "tags": ["Webdevelopment"], "status": "want", "created": 1764999999958},
+  {"id": "tv-43", "cat": "site", "title": "Things", "link": "https://culturedcode.com/things/", "note": "Award-winning task manager that helps you organize your day, manage projects, and track goals across Mac and iOS devices.", "tags": ["Productivity"], "status": "want", "created": 1764999999957},
+  {"id": "tv-44", "cat": "site", "title": "Todoist", "link": "https://todoist.com/", "note": "Cross-platform task management app for organizing personal and professional projects.", "tags": ["Productivity"], "status": "want", "created": 1764999999956},
+  {"id": "tv-45", "cat": "site", "title": "Typedream", "link": "https://typedream.com", "note": "Build websites quickly with a no-code website builder designed for modern creators.", "tags": ["Webdevelopment"], "status": "want", "created": 1764999999955},
+  {"id": "tv-46", "cat": "site", "title": "Typefully", "link": "https://typefully.com/", "note": "Compose, schedule, and analyze your X posts with a clean writing interface.", "tags": ["Social Media", "Productivity"], "status": "want", "created": 1764999999954},
+  {"id": "tv-47", "cat": "site", "title": "Typeshare", "link": "https://typeshare.co", "note": "Create, format, and distribute content across multiple platforms from a single writing interface.", "tags": ["Social Media", "Productivity"], "status": "want", "created": 1764999999953},
+  {"id": "tv-48", "cat": "site", "title": "Webflow", "link": "webflow.com", "note": "Design and build responsive websites visually without coding.", "tags": ["Webdevelopment", "Business"], "status": "want", "created": 1764999999952},
+  {"id": "tv-49", "cat": "site", "title": "WordPress", "link": "https://wordpress.com/", "note": "Build and manage websites with the world's most popular content management system.", "tags": ["Webdevelopment"], "status": "want", "created": 1764999999951},
+  {"id": "tv-50", "cat": "site", "title": "Zapier", "link": "https://zapier.com/", "note": "Connect and automate workflows between different apps without coding.", "tags": ["Business", "Webdevelopment", "Productivity"], "status": "want", "created": 1764999999950},
+  {"id": "tv-51", "cat": "site", "title": "Zoom", "link": "https://zoom.us/", "note": "Connect remotely through video conferencing, online meetings, and chat.", "tags": ["Productivity", "Business"], "status": "want", "created": 1764999999949}
+];
+
+let items = load();
+let activeCat = 'all';
+let activeTag = null;
+let activeStatus = 'all';
+let editingId = null;
+let modalCat = 'site';
+let modalStatus = 'want';
+
+// ---------- persistence ----------
+function uid() { return Math.random().toString(36).slice(2, 10) + Date.now().toString(36); }
+function load() {
+  try {
+    const raw = localStorage.getItem(STORE_KEY);
+    if (raw) return JSON.parse(raw);
+  } catch (e) {}
+  localStorage.setItem(STORE_KEY, JSON.stringify(SEED));
+  return SEED;
+}
+function save() { localStorage.setItem(STORE_KEY, JSON.stringify(items)); }
+
+// ---------- helpers ----------
+function normUrl(url) {
+  if (!url) return '';
+  return /^https?:\/\//i.test(url) ? url : 'https://' + url;
+}
+function domainOf(url) {
+  try { return new URL(normUrl(url)).hostname.replace(/^www\./, ''); } catch (e) { return ''; }
+}
+function faviconUrl(dom) {
+  return 'https://unavatar.io/' + encodeURIComponent(dom) + '?fallback=false';
+}
+// Cadeia de fallback do logo: unavatar -> DuckDuckGo -> emoji da categoria
+function logoFallback(img) {
+  const dom = img.dataset.dom;
+  if (img.dataset.step === '0' && dom) {
+    img.dataset.step = '1';
+    img.src = 'https://icons.duckduckgo.com/ip3/' + encodeURIComponent(dom) + '.ico';
+  } else {
+    const box = img.closest('.card-logo');
+    img.remove();
+    if (box) box.classList.add('fallback');
+  }
+}
+function allTags() {
+  const m = new Map();
+  items.forEach(it => (it.tags || []).forEach(t => m.set(t, (m.get(t) || 0) + 1)));
+  return [...m.entries()].sort((a, b) => b[1] - a[1]);
+}
+function esc(s) { return (s || '').replace(/[&<>"]/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;' }[c])); }
+
+// ---------- render ----------
+function render() {
+  renderCatFilters();
+  renderTagFilters();
+  renderGrid();
+  document.getElementById('countPill').textContent =
+    items.length + (items.length === 1 ? ' item' : ' itens');
+}
+
+function renderCatFilters() {
+  const el = document.getElementById('catFilters');
+  const counts = {};
+  items.forEach(it => counts[it.cat] = (counts[it.cat] || 0) + 1);
+  let html = `<span class="filter-label">Tipo</span>`;
+  html += chipBtn('all', 'Tudo', items.length, activeCat === 'all', 'cat');
+  for (const [k, c] of Object.entries(CATS)) {
+    if (!counts[k]) continue;
+    html += chipBtn(k, CATS[k].emoji + ' ' + CATS[k].label, counts[k], activeCat === k, 'cat');
+  }
+  // status filters appended on same row
+  html += `<span style="width:14px"></span>`;
+  const used = items.filter(i => i.status === 'used').length;
+  const want = items.filter(i => i.status === 'want').length;
+  html += chipBtn('used', '✅ Já usei', used, activeStatus === 'used', 'status', true);
+  html += chipBtn('want', '⭐ Quero usar', want, activeStatus === 'want', 'status');
+  el.innerHTML = html;
+  el.querySelectorAll('[data-kind="cat"]').forEach(b => b.onclick = () => {
+    activeCat = b.dataset.val; render();
+  });
+  el.querySelectorAll('[data-kind="status"]').forEach(b => b.onclick = () => {
+    activeStatus = (activeStatus === b.dataset.val) ? 'all' : b.dataset.val; render();
+  });
+}
+
+function chipBtn(val, label, count, active, kind, green) {
+  return `<button class="chip${active ? ' active' : ''}${green && active ? ' green' : ''}" data-kind="${kind}" data-val="${val}">${esc(label)}${count != null ? ` <span class="ct">${count}</span>` : ''}</button>`;
+}
+
+function renderTagFilters() {
+  const el = document.getElementById('tagFilters');
+  const tags = allTags();
+  if (!tags.length) { el.innerHTML = ''; return; }
+  let html = `<span class="filter-label">Tags</span>`;
+  if (activeTag) html += `<button class="chip active" data-tag="__clear">✕ ${esc(activeTag)}</button>`;
+  tags.slice(0, 24).forEach(([t, c]) => {
+    if (t === activeTag) return;
+    html += `<button class="chip" data-tag="${esc(t)}">${esc(t)} <span class="ct">${c}</span></button>`;
+  });
+  el.innerHTML = html;
+  el.querySelectorAll('[data-tag]').forEach(b => b.onclick = () => {
+    activeTag = b.dataset.tag === '__clear' ? null : b.dataset.tag; render();
+  });
+}
+
+function filtered() {
+  const q = document.getElementById('search').value.trim().toLowerCase();
+  return items.filter(it => {
+    if (activeCat !== 'all' && it.cat !== activeCat) return false;
+    if (activeStatus !== 'all' && it.status !== activeStatus) return false;
+    if (activeTag && !(it.tags || []).includes(activeTag)) return false;
+    if (q) {
+      const hay = [it.title, it.note, it.link, (it.tags || []).join(' ')].join(' ').toLowerCase();
+      if (!hay.includes(q)) return false;
+    }
+    return true;
+  }).sort((a, b) => (b.created || 0) - (a.created || 0));
+}
+
+function renderGrid() {
+  const grid = document.getElementById('grid');
+  const empty = document.getElementById('empty');
+  const list = filtered();
+  if (!list.length) {
+    grid.innerHTML = '';
+    empty.style.display = 'block';
+    document.getElementById('emptyMsg').innerHTML = items.length
+      ? 'Nenhum item bate com esse filtro.'
+      : 'Nada por aqui ainda. Toque no <b>+</b> pra adicionar.';
+    return;
+  }
+  empty.style.display = 'none';
+  grid.innerHTML = list.map(cardHtml).join('');
+  grid.querySelectorAll('[data-act]').forEach(b => {
+    b.onclick = (e) => {
+      e.stopPropagation();
+      const id = b.dataset.id, act = b.dataset.act;
+      if (act === 'edit') openModal(id);
+      if (act === 'del') delItem(id);
+      if (act === 'status') toggleStatus(id);
+    };
+  });
+  grid.querySelectorAll('[data-tagclick]').forEach(b => b.onclick = (e) => {
+    e.stopPropagation(); activeTag = b.dataset.tagclick; render();
+  });
+}
+
+function cardHtml(it) {
+  const cat = CATS[it.cat] || CATS.outro;
+  const dom = domainOf(it.link);
+  const href = normUrl(it.link);
+  const titleInner = href
+    ? `<a href="${esc(href)}" target="_blank" rel="noopener">${esc(it.title)}</a>`
+    : esc(it.title);
+  const logoSrc = it.logo ? it.logo : (dom ? faviconUrl(dom) : '');
+  const logoInner = logoSrc
+    ? `<img class="logo-img" src="${esc(logoSrc)}" alt="" loading="lazy" referrerpolicy="no-referrer" data-dom="${esc(dom)}" data-step="${it.logo ? '1' : '0'}" onerror="logoFallback(this)" /><span class="logo-emoji">${cat.emoji}</span>`
+    : `<span class="logo-emoji">${cat.emoji}</span>`;
+  const logoCls = logoSrc ? 'card-logo' : 'card-logo fallback';
+  const tags = (it.tags || []).map(t =>
+    `<span class="tag" data-tagclick="${esc(t)}">${esc(t)}</span>`).join('');
+  const statusCls = it.status === 'used' ? 'used' : 'want';
+  const statusTxt = it.status === 'used' ? '✅ Já usei' : '⭐ Quero usar';
+  return `<div class="card">
+    <div class="card-top">
+      <div class="${logoCls}">${logoInner}</div>
+      <div class="card-head">
+        <div class="card-title">${titleInner}</div>
+        ${dom ? `<div class="card-domain">${esc(dom)}</div>` : ''}
+      </div>
+    </div>
+    ${it.note ? `<div class="card-note">${esc(it.note)}</div>` : ''}
+    ${tags ? `<div class="card-tags">${tags}</div>` : ''}
+    <div class="card-foot">
+      <button class="status-badge ${statusCls}" data-act="status" data-id="${it.id}" title="Trocar status">${statusTxt}</button>
+      <div class="card-actions">
+        <button class="icon-btn" data-act="edit" data-id="${it.id}" title="Editar">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>
+        </button>
+        <button class="icon-btn del" data-act="del" data-id="${it.id}" title="Excluir">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m2 0v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/></svg>
+        </button>
+      </div>
+    </div>
+  </div>`;
+}
+
+// ---------- actions ----------
+function toggleStatus(id) {
+  const it = items.find(i => i.id === id);
+  if (!it) return;
+  it.status = it.status === 'used' ? 'want' : 'used';
+  save(); render();
+}
+function delItem(id) {
+  const it = items.find(i => i.id === id);
+  if (!confirm(`Excluir "${it ? it.title : 'item'}"?`)) return;
+  items = items.filter(i => i.id !== id);
+  save(); render();
+}
+
+// ---------- modal ----------
+function buildCatPicker() {
+  const el = document.getElementById('catPicker');
+  el.innerHTML = Object.entries(CATS).map(([k, v]) =>
+    `<button class="cat-opt${k === modalCat ? ' active' : ''}" data-cat="${k}"><span class="emoji">${v.emoji}</span>${v.label}</button>`
+  ).join('');
+  el.querySelectorAll('[data-cat]').forEach(b => b.onclick = () => {
+    modalCat = b.dataset.cat;
+    el.querySelectorAll('.cat-opt').forEach(x => x.classList.toggle('active', x.dataset.cat === modalCat));
+  });
+}
+function setStatusPicker() {
+  document.querySelectorAll('#statusPicker .status-opt').forEach(b =>
+    b.classList.toggle('active', b.dataset.status === modalStatus));
+}
+document.querySelectorAll('#statusPicker .status-opt').forEach(b => b.onclick = () => {
+  modalStatus = b.dataset.status; setStatusPicker();
+});
+
+// ---------- autocomplete de tags ----------
+function currentTagToken(input) {
+  const i = input.value.lastIndexOf(',');
+  return input.value.slice(i + 1).trim();
+}
+function enteredTags(input) {
+  return new Set(input.value.split(',').map(s => s.trim().toLowerCase()).filter(Boolean));
+}
+function renderTagSuggest() {
+  const input = document.getElementById('fTags');
+  const box = document.getElementById('tagSuggest');
+  const token = currentTagToken(input).toLowerCase();
+  const used = enteredTags(input);
+  let matches = allTags().filter(([t]) =>
+    !used.has(t.toLowerCase()) && (!token || t.toLowerCase().includes(token)));
+  matches = matches.slice(0, 10);
+  if (!matches.length) { box.classList.remove('show'); box.innerHTML = ''; return; }
+  box.innerHTML = `<span class="ts-label">${token ? 'Tags sugeridas' : 'Tags existentes'}</span>` +
+    matches.map(([t, c]) => `<button type="button" class="ts-chip" data-tag="${esc(t)}">${esc(t)} <span class="ts-ct">${c}</span></button>`).join('');
+  box.classList.add('show');
+  box.querySelectorAll('.ts-chip').forEach(b => b.addEventListener('mousedown', e => {
+    e.preventDefault();
+    pickTag(b.dataset.tag);
+  }));
+}
+function pickTag(tag) {
+  const input = document.getElementById('fTags');
+  const i = input.value.lastIndexOf(',');
+  const head = i >= 0 ? input.value.slice(0, i + 1) + ' ' : '';
+  input.value = head + tag + ', ';
+  input.focus();
+  renderTagSuggest();
+}
+
+function openModal(id) {
+  editingId = id || null;
+  const it = id ? items.find(i => i.id === id) : null;
+  document.getElementById('modalTitle').textContent = it ? 'Editar item' : 'Novo item';
+  modalCat = it ? it.cat : 'site';
+  modalStatus = it ? it.status : 'want';
+  document.getElementById('fTitle').value = it ? it.title : '';
+  document.getElementById('fLink').value = it ? (it.link || '') : '';
+  document.getElementById('fLogo').value = it ? (it.logo || '') : '';
+  document.getElementById('fNote').value = it ? (it.note || '') : '';
+  document.getElementById('fTags').value = it ? (it.tags || []).join(', ') : '';
+  buildCatPicker();
+  setStatusPicker();
+  document.getElementById('overlay').classList.add('show');
+  setTimeout(() => document.getElementById('fTitle').focus(), 50);
+}
+function closeModal() {
+  document.getElementById('overlay').classList.remove('show');
+  editingId = null;
+}
+function saveModal() {
+  const title = document.getElementById('fTitle').value.trim();
+  if (!title) { document.getElementById('fTitle').focus(); return; }
+  const data = {
+    cat: modalCat,
+    title,
+    link: document.getElementById('fLink').value.trim(),
+    logo: document.getElementById('fLogo').value.trim(),
+    note: document.getElementById('fNote').value.trim(),
+    tags: document.getElementById('fTags').value.split(',').map(t => t.trim()).filter(Boolean),
+    status: modalStatus,
+  };
+  if (editingId) {
+    const it = items.find(i => i.id === editingId);
+    Object.assign(it, data);
+  } else {
+    items.unshift({ id: uid(), created: Date.now(), ...data });
+  }
+  save(); closeModal(); render();
+}
+
+// ---------- events ----------
+document.getElementById('search').addEventListener('input', renderGrid);
+document.getElementById('fab').onclick = () => openModal();
+document.getElementById('addBtn').onclick = () => openModal();
+(() => {
+  const fTags = document.getElementById('fTags');
+  fTags.addEventListener('input', renderTagSuggest);
+  fTags.addEventListener('focus', renderTagSuggest);
+  fTags.addEventListener('blur', () => setTimeout(() => {
+    document.getElementById('tagSuggest').classList.remove('show');
+  }, 120));
+})();
+document.getElementById('cancelBtn').onclick = closeModal;
+document.getElementById('saveBtn').onclick = saveModal;
+document.getElementById('overlay').addEventListener('click', e => {
+  if (e.target.id === 'overlay') closeModal();
+});
+document.addEventListener('keydown', e => {
+  const overlayOpen = document.getElementById('overlay').classList.contains('show');
+  if (e.key === 'Escape' && overlayOpen) closeModal();
+  if (e.key === 'Enter' && overlayOpen && (e.metaKey || e.ctrlKey)) saveModal();
+  if (e.key === 'n' && !overlayOpen && document.activeElement.tagName !== 'INPUT' && document.activeElement.tagName !== 'TEXTAREA') {
+    e.preventDefault(); openModal();
+  }
+  if (e.key === '/' && document.activeElement.tagName !== 'INPUT' && document.activeElement.tagName !== 'TEXTAREA') {
+    e.preventDefault(); document.getElementById('search').focus();
+  }
+});
+
+render();
+</script>
+</body>
+</html>
