@@ -232,7 +232,7 @@
     <header>
       <div class="brand">
         <h1>remmember<span class="dot">.</span></h1>
-        <span class="sub">tudo que você já usou — ou ainda quer usar</span>
+        <span class="sub">tudo que você já usa — ou ainda quer testar</span>
         <span class="count-pill" id="countPill">0 itens</span>
         <button class="io-btn" id="exportBtn" title="Baixar backup JSON">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M7 10l5 5 5-5"/><path d="M12 15V3"/></svg>
@@ -304,8 +304,8 @@
       <div class="field">
         <label>Status</label>
         <div class="status-picker" id="statusPicker">
-          <button class="status-opt want active" data-status="want">⭐ Quero usar</button>
-          <button class="status-opt used" data-status="used">✅ Já usei</button>
+          <button class="status-opt want active" data-status="want">⭐ Quero testar</button>
+          <button class="status-opt used" data-status="used">✅ Já uso</button>
         </div>
       </div>
       <div class="modal-actions">
@@ -455,8 +455,8 @@ function renderCatFilters() {
   html += `<span style="width:14px"></span>`;
   const used = items.filter(i => i.status === 'used').length;
   const want = items.filter(i => i.status === 'want').length;
-  html += chipBtn('used', '✅ Já usei', used, activeStatus === 'used', 'status', true);
-  html += chipBtn('want', '⭐ Quero usar', want, activeStatus === 'want', 'status');
+  html += chipBtn('used', '✅ Já uso', used, activeStatus === 'used', 'status', true);
+  html += chipBtn('want', '⭐ Quero testar', want, activeStatus === 'want', 'status');
   el.innerHTML = html;
   el.querySelectorAll('[data-kind="cat"]').forEach(b => b.onclick = () => {
     activeCat = b.dataset.val; render();
@@ -543,7 +543,7 @@ function cardHtml(it) {
   const tags = (it.tags || []).map(t =>
     `<span class="tag" data-tagclick="${esc(t)}">${esc(t)}</span>`).join('');
   const statusCls = it.status === 'used' ? 'used' : 'want';
-  const statusTxt = it.status === 'used' ? '✅ Já usei' : '⭐ Quero usar';
+  const statusTxt = it.status === 'used' ? '✅ Já uso' : '⭐ Quero testar';
   return `<div class="card">
     <div class="card-top">
       <div class="${logoCls}">${logoInner}</div>
