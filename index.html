@@ -262,11 +262,9 @@
   .card-logo {
     height: 118px; flex-shrink: 0; display: grid; place-items: center;
     font-size: 42px; padding: 18px; overflow: hidden;
-    background: #fff; border-bottom: 1px solid var(--border); position: relative;
+    background: var(--bg-card); border-bottom: 1px solid var(--border); position: relative;
   }
-  /* capa do logo fica clara mesmo no dark — logos são desenhados pra fundo claro */
-  .card:hover .card-logo { background: #f7f7f5; }
-  body.dark .card-logo { background: #fff; }
+  .card:hover .card-logo { background: var(--bg-card-hover); }
   .card-logo .logo-img {
     max-width: 52%; max-height: 100%; width: auto; height: auto; object-fit: contain;
     transition: transform .25s ease;
