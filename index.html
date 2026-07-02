@@ -72,7 +72,7 @@
   input, textarea, select { font-family: inherit; font-size: 14px; color: var(--text); }
   ::placeholder { color: var(--text-faint); }
 
-  .wrap { max-width: 1080px; margin: 0 auto; padding: 0 22px; }
+  .wrap { max-width: 1080px; margin: 0 auto; padding: 0 22px; position: relative; }
 
   /* Cover (Notion page cover) */
   .cover {
@@ -82,7 +82,91 @@
   .page-icon {
     font-size: 62px; line-height: 1; margin-top: -38px; position: relative; z-index: 2;
     width: 74px; text-shadow: 0 1px 2px rgba(15,15,15,.15);
+    cursor: pointer; border-radius: 8px; padding: 2px; transition: background .14s;
+    user-select: none;
   }
+  .page-icon:hover { background: var(--hover); }
+  body.view .page-icon { cursor: default; pointer-events: none; }
+  body.noicon .page-icon { display: none; }
+  body.noicon header { padding-top: 30px; }
+  body.nocover .cover { display: none; }
+  body.nocover .page-icon { margin-top: 34px; }
+
+  /* Botão "Alterar capa" (aparece no hover, como no Notion) */
+  .cover { position: relative; }
+  .cover-change {
+    position: absolute; right: 26px; bottom: 14px; z-index: 3;
+    font-size: 12.5px; font-weight: 500; color: var(--text-dim);
+    background: var(--bg); border: 1px solid var(--border-strong); border-radius: var(--radius-sm);
+    padding: 4px 10px; opacity: 0; transition: opacity .15s;
+  }
+  .cover:hover .cover-change { opacity: 1; }
+  .cover-change:hover { color: var(--text); }
+  body.view .cover-change { display: none; }
+  body.nocover .cover-restore { position: static; opacity: 1; margin-top: 10px; }
+
+  /* Popovers (seletor de emoji / capa) */
+  .popover {
+    display: none; position: absolute; z-index: 55;
+    background: var(--modal-bg); border: 1px solid var(--border-strong); border-radius: 10px;
+    box-shadow: var(--shadow); width: min(400px, calc(100vw - 44px));
+    animation: modalIn .15s ease;
+  }
+  .popover.show { display: block; }
+  .pop-head {
+    display: flex; align-items: center; gap: 2px; padding: 8px 10px 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .pop-tab {
+    font-size: 13.5px; font-weight: 500; color: var(--text-faint); padding: 5px 8px 7px;
+    position: relative; transition: color .14s;
+  }
+  .pop-tab:hover { color: var(--text-dim); }
+  .pop-tab.active { color: var(--text); }
+  .pop-tab.active::after {
+    content: ''; position: absolute; left: 8px; right: 8px; bottom: -1px; height: 2px;
+    background: var(--text); border-radius: 1px;
+  }
+  .pop-remove { margin-left: auto; font-size: 13px; color: var(--text-faint); padding: 5px 8px 7px; }
+  .pop-remove:hover { color: var(--text); }
+  .pop-body { padding: 10px; max-height: 340px; overflow-y: auto; }
+  .pop-toolbar { display: flex; gap: 6px; margin-bottom: 8px; }
+  .pop-toolbar input {
+    flex: 1; background: var(--input-bg); border: 1px solid var(--border);
+    border-radius: var(--radius-sm); padding: 6px 10px; font-size: 13.5px;
+  }
+  .pop-toolbar input:focus { outline: none; border-color: var(--accent); }
+  .pop-shuffle {
+    width: 32px; height: 32px; border-radius: var(--radius-sm); display: grid; place-items: center;
+    border: 1px solid var(--border); color: var(--text-dim); font-size: 15px;
+  }
+  .pop-shuffle:hover { background: var(--hover); color: var(--text); }
+  .emoji-cat-label { font-size: 11.5px; color: var(--text-faint); margin: 8px 2px 4px; }
+  .emoji-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(34px, 1fr)); gap: 2px; }
+  .emoji-grid button {
+    font-size: 21px; line-height: 1; padding: 5px 0; border-radius: 6px; transition: background .1s;
+  }
+  .emoji-grid button:hover { background: var(--hover); }
+  /* Galeria de capas */
+  .swatch-label { font-size: 11.5px; color: var(--text-faint); margin: 2px 2px 6px; }
+  .swatch-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+  .swatch {
+    height: 52px; border-radius: 6px; border: 1px solid var(--border);
+    cursor: pointer; transition: transform .12s, box-shadow .12s;
+  }
+  .swatch:hover { transform: scale(1.04); box-shadow: 0 2px 8px rgba(15,15,15,.2); }
+  .pop-field { display: flex; gap: 6px; margin-top: 4px; }
+  .pop-field input {
+    flex: 1; background: var(--input-bg); border: 1px solid var(--border);
+    border-radius: var(--radius-sm); padding: 7px 10px; font-size: 13px;
+  }
+  .pop-field input:focus { outline: none; border-color: var(--accent); }
+  .pop-btn {
+    font-size: 13px; font-weight: 500; color: #fff; background: var(--accent);
+    border-radius: var(--radius-sm); padding: 7px 12px;
+  }
+  .pop-btn:hover { background: #1b70c4; }
+  .pop-note { font-size: 11.5px; color: var(--text-faint); margin-top: 8px; }
 
   /* Header */
   header { padding: 6px 0 8px; }
@@ -320,11 +404,54 @@
 </style>
 </head>
 <body>
-  <div class="cover">
-    <img src="https://images.unsplash.com/photo-1611325058416-db7794e8e32c?ixlib=rb-4.0.3&q=85&fm=jpg&crop=entropy&cs=srgb&w=2400" alt="" />
+  <div class="cover" id="cover">
+    <img id="coverImg" src="https://images.unsplash.com/photo-1611325058416-db7794e8e32c?ixlib=rb-4.0.3&q=85&fm=jpg&crop=entropy&cs=srgb&w=2400" alt="" />
+    <button class="cover-change" id="coverBtn">🖼️ Alterar capa</button>
   </div>
   <div class="wrap">
-    <div class="page-icon">🗂️</div>
+    <div class="page-icon" id="pageIcon" title="Trocar ícone">🗂️</div>
+
+    <!-- Popover: seletor de emoji -->
+    <div class="popover" id="iconPop" style="top: 48px; left: 22px;">
+      <div class="pop-head">
+        <button class="pop-tab active">Emoji</button>
+        <button class="pop-remove" id="iconRemove">Remover</button>
+      </div>
+      <div class="pop-body">
+        <div class="pop-toolbar">
+          <input id="emojiFilter" type="text" placeholder="Filtrar… (ex: coração, foguete)" autocomplete="off" />
+          <button class="pop-shuffle" id="emojiShuffle" title="Aleatório">🔀</button>
+        </div>
+        <div id="emojiList"></div>
+      </div>
+    </div>
+
+    <!-- Popover: seletor de capa -->
+    <div class="popover" id="coverPop" style="top: 10px; right: 22px;">
+      <div class="pop-head">
+        <button class="pop-tab active" data-ctab="gallery">Galeria</button>
+        <button class="pop-tab" data-ctab="upload">Enviar</button>
+        <button class="pop-tab" data-ctab="link">Link</button>
+        <button class="pop-remove" id="coverRemove">Remover</button>
+      </div>
+      <div class="pop-body">
+        <div data-cpanel="gallery">
+          <div class="swatch-label">Cor & Gradiente</div>
+          <div class="swatch-grid" id="swatchGrid"></div>
+        </div>
+        <div data-cpanel="upload" hidden>
+          <button class="pop-btn" id="coverUploadBtn">Escolher imagem…</button>
+          <input type="file" id="coverFile" accept="image/*" hidden />
+          <div class="pop-note">A imagem fica salva só no seu navegador (máx. ~1,5 MB).</div>
+        </div>
+        <div data-cpanel="link" hidden>
+          <div class="pop-field">
+            <input id="coverUrl" type="text" placeholder="Cole a URL de uma imagem…" />
+            <button class="pop-btn" id="coverUrlApply">Aplicar</button>
+          </div>
+        </div>
+      </div>
+    </div>
     <header>
       <div class="brand">
         <h1>remmember<span class="dot">.</span></h1>
@@ -538,8 +665,122 @@ async function gunzipB64(b64) {
   return new TextDecoder().decode(await new Response(stream).arrayBuffer());
 }
 async function buildShareLink() {
-  const enc = await gzipB64(JSON.stringify(items));
+  // inclui itens + personalização da página (ícone/capa) no link
+  const enc = await gzipB64(JSON.stringify({ i: items, p: page }));
   return location.origin + location.pathname + '#v=' + enc;
+}
+
+// ---------- personalização da página (ícone + capa, estilo Notion) ----------
+const PAGE_KEY = 'remmember.page.v1';
+const DEFAULT_COVER_URL = 'https://images.unsplash.com/photo-1611325058416-db7794e8e32c?ixlib=rb-4.0.3&q=85&fm=jpg&crop=entropy&cs=srgb&w=2400';
+const COVER_PRESETS = [
+  ['Vermelho', '#E1655D'],
+  ['Amarelo', '#F3C64F'],
+  ['Azul', '#4C9AD6'],
+  ['Creme', '#FDF1E3'],
+  ['Água', 'linear-gradient(120deg, #A8E6E2 0%, #F6EFE7 100%)'],
+  ['Rosa', 'linear-gradient(120deg, #EE4D9B 0%, #F0578D 100%)'],
+  ['Pôr do sol', 'linear-gradient(120deg, #E96443 0%, #C0392B 100%)'],
+  ['Névoa', 'linear-gradient(120deg, #C9D6FF 0%, #F3E7DC 55%, #E2B8A5 100%)'],
+  ['Aurora', 'radial-gradient(120% 120% at 20% 20%, #7AA5D2 0%, #C86B85 55%, #E2574C 100%)'],
+  ['Roxo', 'linear-gradient(120deg, #6A4FB6 0%, #B06AB3 100%)'],
+  ['Aço', 'linear-gradient(120deg, #5C6E91 0%, #B4A6A0 100%)'],
+];
+function loadPage() {
+  try {
+    const raw = localStorage.getItem(PAGE_KEY);
+    if (raw) return JSON.parse(raw);
+  } catch (e) {}
+  return { icon: '🗂️', cover: { type: 'url', value: DEFAULT_COVER_URL } };
+}
+let page = loadPage();
+function savePage() { if (viewMode) return; localStorage.setItem(PAGE_KEY, JSON.stringify(page)); }
+function applyPage() {
+  // ícone
+  const iconEl = document.getElementById('pageIcon');
+  document.body.classList.toggle('noicon', !page.icon);
+  if (page.icon) iconEl.textContent = page.icon;
+  // capa
+  const cover = document.getElementById('cover');
+  const img = document.getElementById('coverImg');
+  const c = page.cover || { type: 'none' };
+  document.body.classList.toggle('nocover', c.type === 'none');
+  if (c.type === 'url' || c.type === 'data') {
+    img.style.display = 'block';
+    if (img.getAttribute('src') !== c.value) img.src = c.value;
+    cover.style.background = 'none';
+  } else if (c.type === 'preset') {
+    img.style.display = 'none';
+    const p = COVER_PRESETS[c.value];
+    cover.style.background = p ? p[1] : COVER_PRESETS[0][1];
+  }
+}
+function setCover(c) { page.cover = c; savePage(); applyPage(); closePops(); }
+function setIcon(e) { page.icon = e; savePage(); applyPage(); closePops(); }
+
+// Emojis por categoria + palavras-chave pro filtro
+const EMOJI_CATS = [
+  ['Pessoas', '😀 😃 😄 😁 😆 😅 🤣 😂 🙂 😉 😊 😇 🥰 😍 🤩 😘 🥲 😋 😛 😜 🤪 🤑 🤗 🤭 🤫 🤔 🫡 🤨 😐 😶 😏 🙄 😬 😌 😔 🤤 😴 😷 🤒 🤢 🥵 🥶 🥴 🤯 🤠 🥳 😎 🤓 🧐 😕 😮 😲 😳 🥺 😨 😥 😢 😭 😱 😖 😞 😩 🥱 😤 😡 🤬 😈 💀 💩 🤡 👻 👽 🤖 🙈 🙉 🙊 💪 👍 👎 👏 🙌 🤝 🙏 ✌️ 🤞 🤘 👌 👋 ✍️ 🧠 👀 🫶 ❤️ 🧡 💛 💚 💙 💜 🖤 🤍 💔 💯 💥 💫 ✨ 💬 💭 💤'],
+  ['Natureza', '🐶 🐱 🐭 🐹 🐰 🦊 🐻 🐼 🐨 🐯 🦁 🐮 🐷 🐸 🐵 🐔 🐧 🐦 🦆 🦅 🦉 🦄 🐝 🦋 🐌 🐞 🐢 🐍 🐙 🦀 🐬 🐳 🦈 🐘 🦍 🌵 🎄 🌲 🌴 🌱 🍀 🌿 🍁 🍄 🌸 🌼 🌻 🌞 🌝 🌚 🌙 ⭐ 🌟 ⚡ 🔥 🌈 ☀️ ⛅ ☁️ 🌧️ ❄️ ☃️ 🌊 💧'],
+  ['Comida', '🍏 🍎 🍊 🍋 🍌 🍉 🍇 🍓 🫐 🍒 🍑 🥭 🍍 🥥 🥝 🍅 🥑 🥦 🌽 🥕 🍞 🥐 🧀 🍳 🥓 🍔 🍟 🍕 🌭 🌮 🥗 🍝 🍜 🍣 🍤 🍦 🍩 🍪 🎂 🍰 🧁 🍫 🍿 ☕ 🍵 🧃 🥤 🍺 🍷 🥂'],
+  ['Atividades', '⚽ 🏀 🏈 ⚾ 🎾 🏐 🎱 🏓 🏸 🥊 ⛳ 🏹 🎣 🛹 🎿 🏂 🏋️ 🚴 🧘 🏆 🥇 🥈 🥉 🏅 🎫 🎪 🎭 🎨 🎬 🎤 🎧 🎼 🎹 🥁 🎷 🎺 🎸 🎻 🎲 ♟️ 🎯 🎳 🎮 🕹️ 🧩'],
+  ['Viagem', '🚗 🚕 🚙 🚌 🏎️ 🚓 🚑 🚒 🚚 🚜 🛴 🚲 🛵 🏍️ 🚄 🚀 🛸 🚁 ⛵ 🚤 🛳️ ⚓ ✈️ 🛫 🗺️ 🗿 🗽 🗼 🏰 🏯 🎡 🎢 🎠 ⛲ ⛱️ 🏖️ 🏝️ 🏔️ ⛰️ 🌋 🏕️ 🏠 🏢 🏥 🏦 🏨 🏫 ⛪ 🕌 🌃 🌆 🌉'],
+  ['Objetos', '⌚ 📱 💻 ⌨️ 🖥️ 🖨️ 🖱️ 💾 💿 📷 📸 📹 🎥 📞 ☎️ 📺 📻 🎙️ ⏰ ⏳ 📡 🔋 🔌 💡 🔦 🕯️ 💸 💵 💰 💳 💎 ⚖️ 🔧 🔨 ⚙️ 🧲 🛡️ 🔮 🔭 🔬 💊 💉 🧬 🦠 🧼 🛒 🎁 🎈 🎀 🎊 🎉 🪄 📦 📫 ✏️ 🖊️ 🖌️ 📝 📁 📂 📅 📈 📉 📊 📋 📌 📎 📏 🔒 🔑 🗝️ 📚 📖 🔖 🏷️ 🗂️ 🗃️ 🗄️ 🗑️'],
+  ['Símbolos', '✅ ❌ ❓ ❗ ⭕ 🚫 ♻️ 🔱 📛 🔰 ©️ ®️ ™️ ℹ️ 🆗 🆕 🆒 🆓 🔴 🟠 🟡 🟢 🔵 🟣 ⚫ ⚪ 🟥 🟧 🟨 🟩 🟦 🟪 ⬛ ⬜ 🔶 🔷 🔸 🔹 🔺 🔻 💠 🔘 🏁 🚩 🎌 🏳️ 🏳️‍🌈'],
+];
+// filtro por palavra-chave → emojis correspondentes
+const EMOJI_KEYWORDS = {
+  'coracao': '❤️🧡💛💚💙💜🖤🤍💔🫶🥰😍😘', 'coração': '❤️🧡💛💚💙💜🖤🤍💔🫶🥰😍😘',
+  'feliz': '😀😃😄😁🙂😊🥳😆', 'sorriso': '😀😃😄😁🙂😊', 'amor': '🥰😍😘❤️💛🫶',
+  'triste': '😢😭😞😔😩', 'raiva': '😡🤬😤', 'medo': '😱😨😰', 'festa': '🥳🎉🎊🎈🪄',
+  'fogo': '🔥', 'estrela': '⭐🌟✨💫', 'ideia': '💡', 'foguete': '🚀', 'aviao': '✈️🛫', 'avião': '✈️🛫',
+  'livro': '📚📖🔖', 'filme': '🎬🎥📹', 'musica': '🎵🎤🎧🎼🎸🎹', 'música': '🎵🎤🎧🎼🎸🎹',
+  'jogo': '🎮🕹️🎲🎯🧩', 'bola': '⚽🏀🏈⚾🎾🏐', 'trofeu': '🏆🥇🏅', 'troféu': '🏆🥇🏅',
+  'comida': '🍔🍕🍟🌮🍝🍣', 'cafe': '☕', 'café': '☕', 'cerveja': '🍺🥂🍷', 'bolo': '🎂🍰🧁',
+  'casa': '🏠🏢', 'carro': '🚗🚕🏎️', 'praia': '🏖️🏝️⛱️🌊', 'montanha': '🏔️⛰️🌋',
+  'dinheiro': '💰💵💸💳🤑', 'trabalho': '💻📁📊📈', 'pasta': '📁📂🗂️', 'grafico': '📈📉📊', 'gráfico': '📈📉📊',
+  'check': '✅', 'certo': '✅🆗', 'errado': '❌🚫', 'alvo': '🎯', 'chave': '🔑🗝️', 'cadeado': '🔒',
+  'cachorro': '🐶', 'gato': '🐱', 'animal': '🐶🐱🦊🐼🦁🐸🦄', 'flor': '🌸🌼🌻', 'planta': '🌱🌿🍀🌵',
+  'sol': '☀️🌞', 'lua': '🌙🌝🌚', 'chuva': '🌧️⛅☁️', 'neve': '❄️☃️', 'agua': '💧🌊', 'água': '💧🌊',
+  'robo': '🤖', 'robô': '🤖', 'cerebro': '🧠', 'cérebro': '🧠', 'olho': '👀', 'forte': '💪',
+  'ferramenta': '🔧🔨⚙️', 'remedio': '💊💉', 'remédio': '💊💉', 'ciencia': '🔬🔭🧬', 'ciência': '🔬🔭🧬',
+  'presente': '🎁🎀', 'email': '📫📦', 'lapis': '✏️📝', 'lápis': '✏️📝', 'caneta': '🖊️✍️',
+  'relogio': '⌚⏰⏳', 'relógio': '⌚⏰⏳', 'celular': '📱', 'computador': '💻🖥️⌨️', 'foto': '📷📸',
+};
+const ALL_EMOJIS = EMOJI_CATS.flatMap(([, s]) => s.split(' '));
+
+function renderEmojiList(q) {
+  const box = document.getElementById('emojiList');
+  q = (q || '').trim().toLowerCase();
+  if (q) {
+    let set = new Set();
+    for (const [k, v] of Object.entries(EMOJI_KEYWORDS)) {
+      if (k.includes(q)) [...v].forEach(ch => set.add(ch));
+    }
+    // normaliza pares substitutos: filtra pelos emojis conhecidos
+    const found = ALL_EMOJIS.filter(e => [...set].some(ch => e.includes(ch)));
+    const list = found.length ? [...new Set(found)] : [];
+    box.innerHTML = list.length
+      ? `<div class="emoji-grid">${list.map(e => `<button data-emoji="${e}">${e}</button>`).join('')}</div>`
+      : `<div class="pop-note">Nenhum emoji pra "${esc(q)}". Tente: coração, foguete, livro…</div>`;
+  } else {
+    box.innerHTML = EMOJI_CATS.map(([name, s]) =>
+      `<div class="emoji-cat-label">${name}</div>
+       <div class="emoji-grid">${s.split(' ').map(e => `<button data-emoji="${e}">${e}</button>`).join('')}</div>`
+    ).join('');
+  }
+  box.querySelectorAll('[data-emoji]').forEach(b => b.onclick = () => setIcon(b.dataset.emoji));
+}
+
+// ---------- popovers ----------
+function closePops() {
+  document.querySelectorAll('.popover').forEach(p => p.classList.remove('show'));
+}
+function togglePop(id) {
+  const el = document.getElementById(id);
+  const was = el.classList.contains('show');
+  closePops();
+  if (!was) el.classList.add('show');
 }
 
 // ---------- helpers ----------
@@ -944,6 +1185,61 @@ document.getElementById('shareBtn').onclick = async () => {
   }
 };
 document.getElementById('importBtn').onclick = () => document.getElementById('importFile').click();
+
+// ---------- eventos: ícone + capa ----------
+document.getElementById('pageIcon').onclick = (e) => {
+  if (viewMode) return;
+  e.stopPropagation();
+  togglePop('iconPop');
+  renderEmojiList('');
+  document.getElementById('emojiFilter').value = '';
+  setTimeout(() => document.getElementById('emojiFilter').focus(), 50);
+};
+document.getElementById('iconRemove').onclick = () => setIcon('');
+document.getElementById('emojiFilter').addEventListener('input', e => renderEmojiList(e.target.value));
+document.getElementById('emojiShuffle').onclick = () =>
+  setIcon(ALL_EMOJIS[Math.floor(Math.random() * ALL_EMOJIS.length)]);
+
+document.getElementById('coverBtn').onclick = (e) => {
+  e.stopPropagation();
+  togglePop('coverPop');
+};
+document.getElementById('coverRemove').onclick = () => setCover({ type: 'none' });
+// abas do popover de capa
+document.querySelectorAll('#coverPop [data-ctab]').forEach(t => t.onclick = () => {
+  document.querySelectorAll('#coverPop [data-ctab]').forEach(x =>
+    x.classList.toggle('active', x === t));
+  document.querySelectorAll('#coverPop [data-cpanel]').forEach(p =>
+    p.hidden = p.dataset.cpanel !== t.dataset.ctab);
+});
+// galeria de cores/gradientes
+(() => {
+  const grid = document.getElementById('swatchGrid');
+  grid.innerHTML = COVER_PRESETS.map(([name, bg], i) =>
+    `<button class="swatch" style="background:${bg}" title="${name}" data-preset="${i}"></button>`).join('');
+  grid.querySelectorAll('[data-preset]').forEach(b =>
+    b.onclick = () => setCover({ type: 'preset', value: +b.dataset.preset }));
+})();
+// upload de imagem
+document.getElementById('coverUploadBtn').onclick = () => document.getElementById('coverFile').click();
+document.getElementById('coverFile').onchange = (e) => {
+  const f = e.target.files[0];
+  e.target.value = '';
+  if (!f) return;
+  if (f.size > 1500000) { alert('Imagem muito grande (máx. ~1,5 MB). Use uma menor ou um link.'); return; }
+  const r = new FileReader();
+  r.onload = () => setCover({ type: 'data', value: r.result });
+  r.readAsDataURL(f);
+};
+// capa por URL
+document.getElementById('coverUrlApply').onclick = () => {
+  const u = document.getElementById('coverUrl').value.trim();
+  if (u) setCover({ type: 'url', value: normUrl(u) });
+};
+// fecha popovers clicando fora
+document.addEventListener('click', (e) => {
+  if (!e.target.closest('.popover, #pageIcon, #coverBtn')) closePops();
+});
 document.getElementById('importFile').onchange = (e) => {
   if (e.target.files[0]) importData(e.target.files[0]);
   e.target.value = '';
@@ -964,6 +1260,7 @@ document.getElementById('overlay').addEventListener('click', e => {
 document.addEventListener('keydown', e => {
   const overlayOpen = document.getElementById('overlay').classList.contains('show');
   if (e.key === 'Escape' && overlayOpen) closeModal();
+  if (e.key === 'Escape' && !overlayOpen) closePops();
   if (e.key === 'Enter' && overlayOpen && (e.metaKey || e.ctrlKey)) saveModal();
   if (e.key === 'n' && !overlayOpen && !viewMode && document.activeElement.tagName !== 'INPUT' && document.activeElement.tagName !== 'TEXTAREA') {
     e.preventDefault(); openModal();
@@ -980,12 +1277,18 @@ document.addEventListener('keydown', e => {
     document.body.classList.add('view');
     try {
       const data = JSON.parse(await gunzipB64(location.hash.slice(3)));
-      if (Array.isArray(data) && data.length) items = data;
+      if (Array.isArray(data) && data.length) {
+        items = data; // formato antigo (só itens)
+      } else if (data && Array.isArray(data.i)) {
+        items = data.i;
+        if (data.p) page = data.p; // ícone + capa de quem compartilhou
+      }
     } catch (e) {
       alert('Link compartilhado inválido — mostrando o vault local.');
       document.body.classList.remove('view');
     }
   }
+  applyPage();
   render();
 })();
 </script>
