@@ -6,30 +6,33 @@
 <title>remmember</title>
 <style>
   :root {
-    --bg: #0e0f13;
-    --bg-elev: #16181f;
-    --bg-card: #1a1d26;
-    --bg-card-hover: #20242f;
-    --border: #272b36;
-    --border-strong: #343a48;
-    --text: #f2f3f5;
-    --text-dim: #9aa0ad;
-    --text-faint: #646b78;
-    --accent: #FF8A5C;
-    --accent-dim: rgba(255, 138, 92, 0.14);
-    --green: #4ade80;
-    --green-dim: rgba(74, 222, 128, 0.13);
-    --blue: #60a5fa;
-    --radius: 14px;
-    --radius-sm: 9px;
-    --shadow: 0 8px 30px rgba(0,0,0,0.35);
+    --bg: #ffffff;
+    --bg-elev: #f7f7f5;
+    --bg-card: #ffffff;
+    --bg-card-hover: #fbfbfa;
+    --border: rgba(55, 53, 47, 0.09);
+    --border-strong: rgba(55, 53, 47, 0.16);
+    --text: rgb(55, 53, 47);
+    --text-dim: rgba(55, 53, 47, 0.65);
+    --text-faint: rgba(55, 53, 47, 0.45);
+    --accent: #2383E2;
+    --accent-dim: rgba(35, 131, 226, 0.12);
+    --green: #448361;
+    --green-dim: #DBEDDB;
+    --want-bg: #FDECC8;
+    --want-tx: #402C1B;
+    --blue: #2383E2;
+    --radius: 8px;
+    --radius-sm: 6px;
+    --shadow: rgba(15, 15, 15, 0.05) 0px 0px 0px 1px, rgba(15, 15, 15, 0.1) 0px 3px 6px, rgba(15, 15, 15, 0.2) 0px 9px 24px;
+    --card-shadow: rgba(15, 15, 15, 0.1) 0px 0px 0px 1px, rgba(15, 15, 15, 0.1) 0px 2px 4px;
   }
   * { box-sizing: border-box; margin: 0; padding: 0; }
   html, body { height: 100%; }
   body {
     background: var(--bg);
     color: var(--text);
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    font-family: ui-sans-serif, -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, 'Apple Color Emoji', Arial, sans-serif, 'Segoe UI Emoji', 'Segoe UI Symbol';
     -webkit-font-smoothing: antialiased;
     line-height: 1.5;
     padding-bottom: 80px;
@@ -41,107 +44,149 @@
 
   .wrap { max-width: 1080px; margin: 0 auto; padding: 0 22px; }
 
+  /* Cover (Notion page cover) */
+  .cover {
+    width: 100%; height: 26vh; min-height: 170px; max-height: 300px; overflow: hidden;
+  }
+  .cover img { width: 100%; height: 100%; object-fit: cover; object-position: center 50%; display: block; }
+  .page-icon {
+    font-size: 62px; line-height: 1; margin-top: -38px; position: relative; z-index: 2;
+    width: 74px; text-shadow: 0 1px 2px rgba(15,15,15,.15);
+  }
+
   /* Header */
-  header { padding: 42px 0 22px; }
-  .brand { display: flex; align-items: baseline; gap: 12px; }
+  header { padding: 6px 0 8px; }
+  .brand { display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap; }
   .brand h1 {
-    font-size: 30px; font-weight: 800; letter-spacing: -0.03em;
+    font-size: 40px; font-weight: 700; letter-spacing: -0.02em; line-height: 1.2;
   }
-  .brand h1 .dot { color: var(--accent); }
-  .brand .sub { color: var(--text-dim); font-size: 14px; }
-  .count-pill {
-    margin-left: auto; font-size: 12px; color: var(--text-dim);
-    background: var(--bg-elev); border: 1px solid var(--border);
-    padding: 5px 11px; border-radius: 999px; align-self: center;
+  .brand h1 .dot { color: #FF8A5C; }
+  .brand .sub { color: var(--text-dim); font-size: 15px; width: 100%; margin-top: 2px; }
+
+  /* View tabs (Notion database views) */
+  .toolbar {
+    display: flex; align-items: center; gap: 4px; margin-top: 26px;
+    border-bottom: 1px solid var(--border); padding-bottom: 0; flex-wrap: wrap;
   }
+  .vtab {
+    font-size: 14px; color: var(--text-faint); padding: 7px 8px; border-radius: 4px 4px 0 0;
+    display: inline-flex; align-items: center; gap: 6px; position: relative;
+    transition: color .15s, background .15s; font-weight: 500; white-space: nowrap;
+  }
+  .vtab:hover { background: rgba(55,53,47,.06); color: var(--text-dim); }
+  .vtab.active { color: var(--text); }
+  .vtab.active::after {
+    content: ''; position: absolute; left: 8px; right: 8px; bottom: -1px; height: 2px;
+    background: var(--text); border-radius: 1px;
+  }
+  .vtab .ct { font-size: 12px; color: var(--text-faint); font-weight: 400; }
+  .toolbar-right { margin-left: auto; display: flex; align-items: center; gap: 6px; padding-bottom: 5px; }
+  .count-pill { font-size: 12px; color: var(--text-faint); margin-left: 6px; }
   .add-btn {
-    align-self: center; font-size: 13.5px; font-weight: 600; color: #1a0e08;
-    background: var(--accent); padding: 9px 16px; border-radius: 999px;
-    display: inline-flex; align-items: center; gap: 6px; transition: filter .14s, transform .14s;
+    font-size: 14px; font-weight: 500; color: #fff;
+    background: var(--accent); padding: 5px 12px; border-radius: var(--radius-sm);
+    display: inline-flex; align-items: center; gap: 5px; transition: background .14s;
+    box-shadow: rgba(15,15,15,.1) 0 1px 2px;
   }
-  .add-btn:hover { filter: brightness(1.07); transform: translateY(-1px); }
-  .add-btn svg { width: 16px; height: 16px; }
+  .add-btn:hover { background: #1b70c4; }
+  .add-btn svg { width: 14px; height: 14px; }
   .io-btn {
-    align-self: center; font-size: 12.5px; font-weight: 500; color: var(--text-dim);
-    background: var(--bg-elev); border: 1px solid var(--border);
-    padding: 7px 12px; border-radius: 999px; display: inline-flex; align-items: center; gap: 5px;
-    transition: all .14s;
+    font-size: 14px; font-weight: 400; color: var(--text-dim);
+    background: transparent; border: none;
+    padding: 5px 8px; border-radius: var(--radius-sm); display: inline-flex; align-items: center; gap: 5px;
+    transition: background .14s, color .14s;
   }
-  .io-btn:hover { color: var(--text); border-color: var(--border-strong); }
+  .io-btn:hover { background: rgba(55,53,47,.06); color: var(--text); }
   .io-btn svg { width: 14px; height: 14px; }
 
-  /* Search */
-  .searchbar {
-    position: relative; margin: 22px 0 16px;
-  }
-  .searchbar svg { position: absolute; left: 16px; top: 50%; transform: translateY(-50%); color: var(--text-faint); }
+  /* Search (Notion-style, in toolbar) */
+  .searchbar { position: relative; }
+  .searchbar svg { position: absolute; left: 8px; top: 50%; transform: translateY(-50%); color: var(--text-faint); width: 15px; height: 15px; }
   .searchbar input {
-    width: 100%; background: var(--bg-elev); border: 1px solid var(--border);
-    border-radius: var(--radius); padding: 15px 16px 15px 46px; font-size: 16px;
-    transition: border-color .15s, box-shadow .15s;
+    width: 200px; background: transparent; border: none;
+    border-radius: var(--radius-sm); padding: 6px 8px 6px 29px; font-size: 14px;
+    transition: background .15s, width .2s ease;
   }
-  .searchbar input:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-dim); }
+  .searchbar input:hover { background: rgba(55,53,47,.06); }
+  .searchbar input:focus { outline: none; background: var(--bg-elev); width: 260px; }
 
   /* Filter rows */
-  .filters { display: flex; flex-direction: column; gap: 10px; margin-bottom: 24px; }
-  .filter-row { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
-  .filter-label { font-size: 11px; text-transform: uppercase; letter-spacing: .08em; color: var(--text-faint); margin-right: 4px; min-width: 64px; }
+  .filters { display: flex; flex-direction: column; gap: 8px; margin: 14px 0 22px; }
+  .filter-row { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; }
+  .filter-label { font-size: 11px; text-transform: uppercase; letter-spacing: .06em; color: var(--text-faint); margin-right: 4px; min-width: 42px; }
   .chip {
-    font-size: 13px; padding: 6px 13px; border-radius: 999px;
-    background: var(--bg-elev); border: 1px solid var(--border); color: var(--text-dim);
-    transition: all .14s; display: inline-flex; align-items: center; gap: 6px;
+    font-size: 13px; padding: 3px 10px; border-radius: 999px;
+    background: transparent; border: 1px solid var(--border-strong); color: var(--text-dim);
+    transition: all .14s; display: inline-flex; align-items: center; gap: 5px;
   }
-  .chip:hover { border-color: var(--border-strong); color: var(--text); }
+  .chip:hover { background: rgba(55,53,47,.06); color: var(--text); }
   .chip.active { background: var(--accent-dim); border-color: var(--accent); color: var(--accent); }
   .chip.active.green { background: var(--green-dim); border-color: var(--green); color: var(--green); }
   .chip .ct { font-size: 11px; opacity: .65; }
+  /* Notion multi-select pill */
+  .npill {
+    font-size: 12px; padding: 1px 8px; border-radius: 3px; border: none;
+    display: inline-flex; align-items: center; gap: 4px; line-height: 1.5;
+    white-space: nowrap; transition: filter .12s, box-shadow .12s; cursor: pointer;
+  }
+  .npill:hover { filter: brightness(.96); }
+  .npill.active { box-shadow: 0 0 0 2px var(--accent); }
+  .npill .ct { font-size: 11px; opacity: .6; }
 
-  /* Cards grid */
-  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(290px, 1fr)); gap: 16px; }
+  /* Cards grid (Notion gallery) */
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 16px; }
   .card {
-    background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius);
-    padding: 18px; display: flex; flex-direction: column; gap: 11px; position: relative;
-    transition: border-color .15s, transform .15s, background .15s;
-    animation: pop .25s ease;
+    background: var(--bg-card); border-radius: var(--radius);
+    box-shadow: var(--card-shadow);
+    display: flex; flex-direction: column; position: relative; overflow: hidden;
+    transition: background .15s, box-shadow .15s; cursor: pointer;
+    animation: pop .3s ease;
   }
   @keyframes pop { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
-  .card:hover { border-color: var(--border-strong); background: var(--bg-card-hover); }
-  .card-top { display: flex; align-items: flex-start; gap: 12px; }
+  .card:hover { background: var(--bg-card-hover); box-shadow: rgba(15,15,15,.1) 0 0 0 1px, rgba(15,15,15,.14) 0 3px 8px; }
+  /* Card cover: big centered logo, Notion "contain" */
   .card-logo {
-    width: 46px; height: 46px; border-radius: 11px; flex-shrink: 0;
-    display: grid; place-items: center; font-size: 22px; overflow: hidden;
-    background: #fff; border: 1px solid var(--border); position: relative;
+    height: 118px; flex-shrink: 0; display: grid; place-items: center;
+    font-size: 42px; padding: 18px; overflow: hidden;
+    background: #fff; border-bottom: 1px solid var(--border); position: relative;
   }
-  .card-logo.fallback { background: var(--bg-elev); }
-  .card-logo .logo-img { width: 100%; height: 100%; object-fit: contain; padding: 7px; }
+  .card:hover .card-logo { background: var(--bg-card-hover); }
+  .card-logo .logo-img {
+    max-width: 52%; max-height: 100%; width: auto; height: auto; object-fit: contain;
+    transition: transform .25s ease;
+  }
+  .card:hover .card-logo .logo-img { transform: scale(1.05); }
   .card-logo .logo-emoji { display: none; }
   .card-logo.fallback .logo-emoji { display: block; }
-  .card-head { flex: 1; min-width: 0; }
-  .card-title { font-size: 15.5px; font-weight: 650; letter-spacing: -0.01em; line-height: 1.3; word-break: break-word; }
+  .card-body { padding: 9px 12px 11px; display: flex; flex-direction: column; gap: 7px; flex: 1; }
+  .card-title { font-size: 14px; font-weight: 500; line-height: 1.35; word-break: break-word; }
   .card-title a { text-decoration: none; }
-  .card-title a:hover { color: var(--accent); }
-  .card-domain { font-size: 12px; color: var(--text-faint); margin-top: 2px; word-break: break-all; }
-  .card-note { font-size: 13.5px; color: var(--text-dim); line-height: 1.5; }
-  .card-tags { display: flex; gap: 6px; flex-wrap: wrap; }
+  .card-title a:hover { text-decoration: underline; text-decoration-color: var(--text-faint); text-underline-offset: 2px; }
+  .card-domain { font-size: 11px; color: var(--text-faint); margin-top: 1px; word-break: break-all; }
+  .card-note {
+    font-size: 12px; color: var(--text-dim); line-height: 1.5;
+    display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;
+  }
+  .card-tags { display: flex; gap: 4px; flex-wrap: wrap; }
   .tag {
-    font-size: 11.5px; padding: 3px 9px; border-radius: 6px;
-    background: var(--bg-elev); border: 1px solid var(--border); color: var(--text-dim);
-    cursor: pointer; transition: all .12s;
+    font-size: 12px; padding: 1px 7px; border-radius: 3px; border: none;
+    cursor: pointer; transition: filter .12s; line-height: 1.5;
   }
-  .tag:hover { color: var(--accent); border-color: var(--accent); }
-  .card-foot { display: flex; align-items: center; gap: 8px; margin-top: 2px; padding-top: 11px; border-top: 1px solid var(--border); }
+  .tag:hover { filter: brightness(.95); }
+  .card-foot { display: flex; align-items: center; gap: 8px; margin-top: auto; padding-top: 8px; }
   .status-badge {
-    font-size: 11.5px; font-weight: 600; padding: 4px 10px; border-radius: 999px;
-    display: inline-flex; align-items: center; gap: 5px; cursor: pointer; transition: all .14s;
+    font-size: 12px; font-weight: 500; padding: 1px 8px; border-radius: 3px;
+    display: inline-flex; align-items: center; gap: 4px; cursor: pointer; transition: filter .14s;
+    line-height: 1.6;
   }
-  .status-badge.used { background: var(--green-dim); color: var(--green); }
-  .status-badge.want { background: var(--accent-dim); color: var(--accent); }
-  .status-badge:hover { filter: brightness(1.2); }
+  .status-badge.used { background: var(--green-dim); color: #1C3829; }
+  .status-badge.want { background: var(--want-bg); color: var(--want-tx); }
+  .status-badge:hover { filter: brightness(.95); }
   .card-actions { margin-left: auto; display: flex; gap: 2px; opacity: 0; transition: opacity .15s; }
   .card:hover .card-actions { opacity: 1; }
-  .icon-btn { width: 28px; height: 28px; border-radius: 7px; display: grid; place-items: center; color: var(--text-faint); transition: all .12s; }
-  .icon-btn:hover { background: var(--bg-elev); color: var(--text); }
-  .icon-btn.del:hover { color: #f87171; }
+  .icon-btn { width: 26px; height: 26px; border-radius: 4px; display: grid; place-items: center; color: var(--text-faint); transition: all .12s; }
+  .icon-btn:hover { background: rgba(55,53,47,.08); color: var(--text); }
+  .icon-btn.del:hover { color: #EB5757; }
 
   /* Empty state */
   .empty { text-align: center; padding: 70px 20px; color: var(--text-faint); }
@@ -152,31 +197,33 @@
   .fab {
     position: fixed; right: 28px; bottom: 28px; z-index: 40;
     width: 56px; height: 56px; border-radius: 999px;
-    background: var(--accent); color: #1a0e08; display: grid; place-items: center;
-    box-shadow: 0 8px 24px rgba(255,138,92,.4); transition: transform .15s, box-shadow .15s;
+    background: var(--accent); color: #fff; display: grid; place-items: center;
+    box-shadow: 0 8px 24px rgba(35,131,226,.35); transition: transform .15s, box-shadow .15s;
   }
-  .fab:hover { transform: scale(1.06); box-shadow: 0 10px 30px rgba(255,138,92,.5); }
+  .fab:hover { transform: scale(1.06); box-shadow: 0 10px 30px rgba(35,131,226,.45); }
   .fab svg { width: 26px; height: 26px; }
 
   /* Modal */
   .overlay {
-    position: fixed; inset: 0; background: rgba(0,0,0,.6); backdrop-filter: blur(4px);
+    position: fixed; inset: 0; background: rgba(15,15,15,.6);
     display: none; align-items: center; justify-content: center; z-index: 60; padding: 24px 18px;
     overflow-y: auto;
   }
   .overlay.show { display: flex; }
   .modal {
-    background: var(--bg-elev); border: 1px solid var(--border-strong); border-radius: 18px;
+    background: #fff; border-radius: 10px;
     width: 100%; max-width: 480px; padding: 26px; box-shadow: var(--shadow);
-    animation: pop .2s ease; max-height: calc(100vh - 48px); overflow-y: auto;
+    animation: modalIn .18s ease; max-height: calc(100vh - 48px); overflow-y: auto;
   }
+  @keyframes modalIn { from { opacity: 0; transform: scale(.98) translateY(8px); } to { opacity: 1; transform: none; } }
   .modal h2 { font-size: 18px; font-weight: 700; margin-bottom: 20px; letter-spacing: -0.02em; }
   .field { margin-bottom: 16px; }
   .field label { display: block; font-size: 12px; color: var(--text-dim); margin-bottom: 7px; font-weight: 500; }
   .field input, .field textarea, .field select {
-    width: 100%; background: var(--bg-card); border: 1px solid var(--border);
-    border-radius: var(--radius-sm); padding: 11px 13px; transition: border-color .15s, box-shadow .15s;
+    width: 100%; background: rgba(242,241,238,.6); border: 1px solid var(--border);
+    border-radius: var(--radius-sm); padding: 9px 12px; transition: border-color .15s, box-shadow .15s, background .15s;
   }
+  .field input:focus, .field textarea:focus { background: #fff; }
   .field input:focus, .field textarea:focus, .field select:focus {
     outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-dim);
   }
@@ -196,15 +243,15 @@
     background: var(--bg-card); border: 1px solid var(--border); transition: all .14s;
     font-size: 13px; font-weight: 600; color: var(--text-dim);
   }
-  .status-opt.active.want { border-color: var(--accent); background: var(--accent-dim); color: var(--accent); }
+  .status-opt.active.want { border-color: #D9730D; background: var(--want-bg); color: var(--want-tx); }
   .status-opt.active.used { border-color: var(--green); background: var(--green-dim); color: var(--green); }
   .modal-actions { display: flex; gap: 10px; margin-top: 24px; }
   .btn {
     flex: 1; padding: 12px; border-radius: var(--radius-sm); font-size: 14px; font-weight: 600;
     transition: all .14s;
   }
-  .btn-primary { background: var(--accent); color: #1a0e08; }
-  .btn-primary:hover { filter: brightness(1.08); }
+  .btn-primary { background: var(--accent); color: #fff; }
+  .btn-primary:hover { background: #1b70c4; }
   .btn-ghost { background: var(--bg-card); border: 1px solid var(--border); color: var(--text-dim); }
   .btn-ghost:hover { color: var(--text); border-color: var(--border-strong); }
   .hint { font-size: 11.5px; color: var(--text-faint); margin-top: 6px; }
@@ -212,46 +259,55 @@
   .tag-suggest.show { display: flex; }
   .tag-suggest .ts-label { font-size: 11px; color: var(--text-faint); width: 100%; margin-bottom: -2px; }
   .ts-chip {
-    font-size: 12.5px; padding: 5px 11px; border-radius: 7px; cursor: pointer;
-    background: var(--bg-card); border: 1px solid var(--border); color: var(--text-dim);
-    transition: all .12s;
+    font-size: 12px; padding: 1px 8px; border-radius: 3px; cursor: pointer;
+    border: none; line-height: 1.6; transition: filter .12s;
   }
-  .ts-chip:hover { color: var(--accent); border-color: var(--accent); background: var(--accent-dim); }
+  .ts-chip:hover { filter: brightness(.95); }
   .ts-chip .ts-ct { opacity: .55; font-size: 11px; }
 
   @media (max-width: 560px) {
-    header { padding: 28px 0 16px; }
-    .brand { flex-wrap: wrap; }
-    .count-pill { margin-left: 0; }
+    .brand h1 { font-size: 32px; }
+    .toolbar-right { margin-left: 0; width: 100%; }
+    .searchbar input, .searchbar input:focus { width: 100%; }
+    .searchbar { flex: 1; }
     .filter-label { min-width: auto; width: 100%; }
+    .cover { height: 20vh; min-height: 130px; }
   }
 </style>
 </head>
 <body>
+  <div class="cover">
+    <img src="https://images.unsplash.com/photo-1611325058416-db7794e8e32c?ixlib=rb-4.0.3&q=85&fm=jpg&crop=entropy&cs=srgb&w=2400" alt="" />
+  </div>
   <div class="wrap">
+    <div class="page-icon">🗂️</div>
     <header>
       <div class="brand">
         <h1>remmember<span class="dot">.</span></h1>
-        <span class="sub">tudo que você já usa — ou ainda quer testar</span>
-        <span class="count-pill" id="countPill">0 itens</span>
-        <button class="io-btn" id="exportBtn" title="Baixar backup JSON">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M7 10l5 5 5-5"/><path d="M12 15V3"/></svg>
-          Exportar
-        </button>
-        <button class="io-btn" id="importBtn" title="Importar backup JSON">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M7 9l5-5 5 5"/><path d="M12 4v12"/></svg>
-          Importar
-        </button>
-        <input type="file" id="importFile" accept="application/json,.json" hidden />
-        <button class="add-btn" id="addBtn">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
-          Adicionar
-        </button>
+        <span class="sub">tudo que você já usa — ou ainda quer testar <span class="count-pill" id="countPill">0 itens</span></span>
       </div>
 
-      <div class="searchbar">
-        <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
-        <input id="search" type="text" placeholder="Buscar por nome, nota, tag ou link…" autocomplete="off" />
+      <div class="toolbar">
+        <div id="viewTabs" style="display:contents"></div>
+        <div class="toolbar-right">
+          <div class="searchbar">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
+            <input id="search" type="text" placeholder="Buscar…" autocomplete="off" />
+          </div>
+          <button class="io-btn" id="exportBtn" title="Baixar backup JSON">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M7 10l5 5 5-5"/><path d="M12 15V3"/></svg>
+            Exportar
+          </button>
+          <button class="io-btn" id="importBtn" title="Importar backup JSON">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M7 9l5-5 5 5"/><path d="M12 4v12"/></svg>
+            Importar
+          </button>
+          <input type="file" id="importFile" accept="application/json,.json" hidden />
+          <button class="add-btn" id="addBtn">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+            Adicionar
+          </button>
+        </div>
       </div>
 
       <div class="filters">
@@ -432,13 +488,65 @@ function allTags() {
 }
 function esc(s) { return (s || '').replace(/[&<>"]/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;' }[c])); }
 
+// Paleta de multi-select do Notion (light)
+const NOTION_COLORS = {
+  gray:    { bg: '#E3E2E0', tx: '#32302C' },
+  brown:   { bg: '#EEE0DA', tx: '#442A1E' },
+  orange:  { bg: '#FADEC9', tx: '#49290E' },
+  yellow:  { bg: '#FDECC8', tx: '#402C1B' },
+  green:   { bg: '#DBEDDB', tx: '#1C3829' },
+  blue:    { bg: '#D3E5EF', tx: '#183347' },
+  purple:  { bg: '#E8DEEE', tx: '#412454' },
+  pink:    { bg: '#F5E0E9', tx: '#4C2337' },
+  red:     { bg: '#FFE2DD', tx: '#5D1715' },
+  default: { bg: 'rgba(227,226,224,.5)', tx: '#32302C' },
+};
+// Cores exatas do ToolVault de referência
+const TAG_COLOR_MAP = {
+  'writing': 'green', 'productivity': 'pink', 'a.i.': 'red', 'design': 'brown',
+  'courses': 'default', 'business': 'purple', 'webdevelopment': 'blue',
+  'payment': 'green', 'seo': 'yellow', 'social media': 'red',
+  'research': 'gray', 'marketing': 'orange',
+};
+const PALETTE_KEYS = ['gray', 'brown', 'orange', 'yellow', 'green', 'blue', 'purple', 'pink', 'red'];
+function tagColor(t) {
+  const key = TAG_COLOR_MAP[t.toLowerCase()];
+  if (key) return NOTION_COLORS[key];
+  let h = 0;
+  for (let i = 0; i < t.length; i++) h = (h * 31 + t.charCodeAt(i)) >>> 0;
+  return NOTION_COLORS[PALETTE_KEYS[h % PALETTE_KEYS.length]];
+}
+function pillStyle(t) {
+  const c = tagColor(t);
+  return `background:${c.bg};color:${c.tx}`;
+}
+
 // ---------- render ----------
 function render() {
+  renderTabs();
   renderCatFilters();
   renderTagFilters();
   renderGrid();
   document.getElementById('countPill').textContent =
     items.length + (items.length === 1 ? ' item' : ' itens');
+}
+
+// Abas de visualização (estilo views do Notion)
+function renderTabs() {
+  const el = document.getElementById('viewTabs');
+  const used = items.filter(i => i.status === 'used').length;
+  const want = items.filter(i => i.status === 'want').length;
+  const tabs = [
+    { val: 'all', label: '🗂️ Todas', ct: items.length },
+    { val: 'used', label: '✅ Já uso', ct: used },
+    { val: 'want', label: '⭐ Quero testar', ct: want },
+  ];
+  el.innerHTML = tabs.map(t =>
+    `<button class="vtab${activeStatus === t.val ? ' active' : ''}" data-val="${t.val}">${t.label} <span class="ct">${t.ct}</span></button>`
+  ).join('');
+  el.querySelectorAll('.vtab').forEach(b => b.onclick = () => {
+    activeStatus = b.dataset.val; render();
+  });
 }
 
 function renderCatFilters() {
@@ -451,18 +559,9 @@ function renderCatFilters() {
     if (!counts[k]) continue;
     html += chipBtn(k, CATS[k].emoji + ' ' + CATS[k].label, counts[k], activeCat === k, 'cat');
   }
-  // status filters appended on same row
-  html += `<span style="width:14px"></span>`;
-  const used = items.filter(i => i.status === 'used').length;
-  const want = items.filter(i => i.status === 'want').length;
-  html += chipBtn('used', '✅ Já uso', used, activeStatus === 'used', 'status', true);
-  html += chipBtn('want', '⭐ Quero testar', want, activeStatus === 'want', 'status');
   el.innerHTML = html;
   el.querySelectorAll('[data-kind="cat"]').forEach(b => b.onclick = () => {
     activeCat = b.dataset.val; render();
-  });
-  el.querySelectorAll('[data-kind="status"]').forEach(b => b.onclick = () => {
-    activeStatus = (activeStatus === b.dataset.val) ? 'all' : b.dataset.val; render();
   });
 }
 
@@ -475,10 +574,10 @@ function renderTagFilters() {
   const tags = allTags();
   if (!tags.length) { el.innerHTML = ''; return; }
   let html = `<span class="filter-label">Tags</span>`;
-  if (activeTag) html += `<button class="chip active" data-tag="__clear">✕ ${esc(activeTag)}</button>`;
+  if (activeTag) html += `<button class="npill active" style="${pillStyle(activeTag)}" data-tag="__clear">✕ ${esc(activeTag)}</button>`;
   tags.slice(0, 24).forEach(([t, c]) => {
     if (t === activeTag) return;
-    html += `<button class="chip" data-tag="${esc(t)}">${esc(t)} <span class="ct">${c}</span></button>`;
+    html += `<button class="npill" style="${pillStyle(t)}" data-tag="${esc(t)}">${esc(t)} <span class="ct">${c}</span></button>`;
   });
   el.innerHTML = html;
   el.querySelectorAll('[data-tag]').forEach(b => b.onclick = () => {
@@ -526,6 +625,11 @@ function renderGrid() {
   grid.querySelectorAll('[data-tagclick]').forEach(b => b.onclick = (e) => {
     e.stopPropagation(); activeTag = b.dataset.tagclick; render();
   });
+  // clique no card abre o item (como abrir uma página no Notion)
+  grid.querySelectorAll('[data-card]').forEach(c => c.onclick = (e) => {
+    if (e.target.closest('a, [data-act], [data-tagclick]')) return;
+    openModal(c.dataset.card);
+  });
 }
 
 function cardHtml(it) {
@@ -541,20 +645,19 @@ function cardHtml(it) {
     : `<span class="logo-emoji">${cat.emoji}</span>`;
   const logoCls = logoSrc ? 'card-logo' : 'card-logo fallback';
   const tags = (it.tags || []).map(t =>
-    `<span class="tag" data-tagclick="${esc(t)}">${esc(t)}</span>`).join('');
+    `<span class="tag" style="${pillStyle(t)}" data-tagclick="${esc(t)}">${esc(t)}</span>`).join('');
   const statusCls = it.status === 'used' ? 'used' : 'want';
   const statusTxt = it.status === 'used' ? '✅ Já uso' : '⭐ Quero testar';
-  return `<div class="card">
-    <div class="card-top">
-      <div class="${logoCls}">${logoInner}</div>
-      <div class="card-head">
+  return `<div class="card" data-card="${it.id}">
+    <div class="${logoCls}">${logoInner}</div>
+    <div class="card-body">
+      <div>
         <div class="card-title">${titleInner}</div>
         ${dom ? `<div class="card-domain">${esc(dom)}</div>` : ''}
       </div>
-    </div>
-    ${it.note ? `<div class="card-note">${esc(it.note)}</div>` : ''}
-    ${tags ? `<div class="card-tags">${tags}</div>` : ''}
-    <div class="card-foot">
+      ${it.note ? `<div class="card-note">${esc(it.note)}</div>` : ''}
+      ${tags ? `<div class="card-tags">${tags}</div>` : ''}
+      <div class="card-foot">
       <button class="status-badge ${statusCls}" data-act="status" data-id="${it.id}" title="Trocar status">${statusTxt}</button>
       <div class="card-actions">
         <button class="icon-btn" data-act="edit" data-id="${it.id}" title="Editar">
@@ -563,6 +666,7 @@ function cardHtml(it) {
         <button class="icon-btn del" data-act="del" data-id="${it.id}" title="Excluir">
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m2 0v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/></svg>
         </button>
+      </div>
       </div>
     </div>
   </div>`;
@@ -657,7 +761,7 @@ function renderTagSuggest() {
   matches = matches.slice(0, 10);
   if (!matches.length) { box.classList.remove('show'); box.innerHTML = ''; return; }
   box.innerHTML = `<span class="ts-label">${token ? 'Tags sugeridas' : 'Tags existentes'}</span>` +
-    matches.map(([t, c]) => `<button type="button" class="ts-chip" data-tag="${esc(t)}">${esc(t)} <span class="ts-ct">${c}</span></button>`).join('');
+    matches.map(([t, c]) => `<button type="button" class="ts-chip" style="${pillStyle(t)}" data-tag="${esc(t)}">${esc(t)} <span class="ts-ct">${c}</span></button>`).join('');
   box.classList.add('show');
   box.querySelectorAll('.ts-chip').forEach(b => b.addEventListener('mousedown', e => {
     e.preventDefault();
