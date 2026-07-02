@@ -26,7 +26,37 @@
     --radius-sm: 6px;
     --shadow: rgba(15, 15, 15, 0.05) 0px 0px 0px 1px, rgba(15, 15, 15, 0.1) 0px 3px 6px, rgba(15, 15, 15, 0.2) 0px 9px 24px;
     --card-shadow: rgba(15, 15, 15, 0.1) 0px 0px 0px 1px, rgba(15, 15, 15, 0.1) 0px 2px 4px;
+    --card-shadow-hover: rgba(15,15,15,.1) 0 0 0 1px, rgba(15,15,15,.14) 0 3px 8px;
+    --hover: rgba(55, 53, 47, 0.06);
+    --modal-bg: #ffffff;
+    --input-bg: rgba(242, 241, 238, 0.6);
+    --used-tx: #1C3829;
   }
+  /* Notion dark mode */
+  body.dark {
+    --bg: #191919;
+    --bg-elev: #252525;
+    --bg-card: #202020;
+    --bg-card-hover: #2a2a2a;
+    --border: rgba(255, 255, 255, 0.094);
+    --border-strong: rgba(255, 255, 255, 0.17);
+    --text: rgba(255, 255, 255, 0.87);
+    --text-dim: rgba(255, 255, 255, 0.55);
+    --text-faint: rgba(255, 255, 255, 0.38);
+    --accent-dim: rgba(35, 131, 226, 0.2);
+    --green: #529E72;
+    --green-dim: #2B593F;
+    --want-bg: #89632A;
+    --want-tx: #FDECC8;
+    --shadow: rgba(255, 255, 255, 0.09) 0 0 0 1px, rgba(0, 0, 0, 0.44) 0 9px 24px;
+    --card-shadow: rgba(255, 255, 255, 0.094) 0 0 0 1px, rgba(0, 0, 0, 0.2) 0 2px 4px;
+    --card-shadow-hover: rgba(255,255,255,.17) 0 0 0 1px, rgba(0,0,0,.3) 0 3px 8px;
+    --hover: rgba(255, 255, 255, 0.055);
+    --modal-bg: #252525;
+    --input-bg: rgba(255, 255, 255, 0.055);
+    --used-tx: #C9E5D1;
+  }
+  body.dark .cover img { filter: brightness(.82); }
   * { box-sizing: border-box; margin: 0; padding: 0; }
   html, body { height: 100%; }
   body {
@@ -73,7 +103,7 @@
     display: inline-flex; align-items: center; gap: 6px; position: relative;
     transition: color .15s, background .15s; font-weight: 500; white-space: nowrap;
   }
-  .vtab:hover { background: rgba(55,53,47,.06); color: var(--text-dim); }
+  .vtab:hover { background: var(--hover); color: var(--text-dim); }
   .vtab.active { color: var(--text); }
   .vtab.active::after {
     content: ''; position: absolute; left: 8px; right: 8px; bottom: -1px; height: 2px;
@@ -96,7 +126,7 @@
     padding: 5px 8px; border-radius: var(--radius-sm); display: inline-flex; align-items: center; gap: 5px;
     transition: background .14s, color .14s;
   }
-  .io-btn:hover { background: rgba(55,53,47,.06); color: var(--text); }
+  .io-btn:hover { background: var(--hover); color: var(--text); }
   .io-btn svg { width: 14px; height: 14px; }
 
   /* Search (Notion-style, in toolbar) */
@@ -107,7 +137,7 @@
     border-radius: var(--radius-sm); padding: 6px 8px 6px 29px; font-size: 14px;
     transition: background .15s, width .2s ease;
   }
-  .searchbar input:hover { background: rgba(55,53,47,.06); }
+  .searchbar input:hover { background: var(--hover); }
   .searchbar input:focus { outline: none; background: var(--bg-elev); width: 260px; }
 
   /* Filter rows */
@@ -119,7 +149,7 @@
     background: transparent; border: 1px solid var(--border-strong); color: var(--text-dim);
     transition: all .14s; display: inline-flex; align-items: center; gap: 5px;
   }
-  .chip:hover { background: rgba(55,53,47,.06); color: var(--text); }
+  .chip:hover { background: var(--hover); color: var(--text); }
   .chip.active { background: var(--accent-dim); border-color: var(--accent); color: var(--accent); }
   .chip.active.green { background: var(--green-dim); border-color: var(--green); color: var(--green); }
   .chip .ct { font-size: 11px; opacity: .65; }
@@ -143,14 +173,16 @@
     animation: pop .3s ease;
   }
   @keyframes pop { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
-  .card:hover { background: var(--bg-card-hover); box-shadow: rgba(15,15,15,.1) 0 0 0 1px, rgba(15,15,15,.14) 0 3px 8px; }
+  .card:hover { background: var(--bg-card-hover); box-shadow: var(--card-shadow-hover); }
   /* Card cover: big centered logo, Notion "contain" */
   .card-logo {
     height: 118px; flex-shrink: 0; display: grid; place-items: center;
     font-size: 42px; padding: 18px; overflow: hidden;
     background: #fff; border-bottom: 1px solid var(--border); position: relative;
   }
-  .card:hover .card-logo { background: var(--bg-card-hover); }
+  /* capa do logo fica clara mesmo no dark — logos são desenhados pra fundo claro */
+  .card:hover .card-logo { background: #f7f7f5; }
+  body.dark .card-logo { background: #fff; }
   .card-logo .logo-img {
     max-width: 52%; max-height: 100%; width: auto; height: auto; object-fit: contain;
     transition: transform .25s ease;
@@ -179,13 +211,13 @@
     display: inline-flex; align-items: center; gap: 4px; cursor: pointer; transition: filter .14s;
     line-height: 1.6;
   }
-  .status-badge.used { background: var(--green-dim); color: #1C3829; }
+  .status-badge.used { background: var(--green-dim); color: var(--used-tx); }
   .status-badge.want { background: var(--want-bg); color: var(--want-tx); }
   .status-badge:hover { filter: brightness(.95); }
   .card-actions { margin-left: auto; display: flex; gap: 2px; opacity: 0; transition: opacity .15s; }
   .card:hover .card-actions { opacity: 1; }
   .icon-btn { width: 26px; height: 26px; border-radius: 4px; display: grid; place-items: center; color: var(--text-faint); transition: all .12s; }
-  .icon-btn:hover { background: rgba(55,53,47,.08); color: var(--text); }
+  .icon-btn:hover { background: var(--hover); color: var(--text); }
   .icon-btn.del:hover { color: #EB5757; }
 
   /* Empty state */
@@ -211,7 +243,7 @@
   }
   .overlay.show { display: flex; }
   .modal {
-    background: #fff; border-radius: 10px;
+    background: var(--modal-bg); border-radius: 10px;
     width: 100%; max-width: 480px; padding: 26px; box-shadow: var(--shadow);
     animation: modalIn .18s ease; max-height: calc(100vh - 48px); overflow-y: auto;
   }
@@ -220,10 +252,10 @@
   .field { margin-bottom: 16px; }
   .field label { display: block; font-size: 12px; color: var(--text-dim); margin-bottom: 7px; font-weight: 500; }
   .field input, .field textarea, .field select {
-    width: 100%; background: rgba(242,241,238,.6); border: 1px solid var(--border);
+    width: 100%; background: var(--input-bg); border: 1px solid var(--border);
     border-radius: var(--radius-sm); padding: 9px 12px; transition: border-color .15s, box-shadow .15s, background .15s;
   }
-  .field input:focus, .field textarea:focus { background: #fff; }
+  .field input:focus, .field textarea:focus { background: var(--modal-bg); }
   .field input:focus, .field textarea:focus, .field select:focus {
     outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-dim);
   }
@@ -265,6 +297,18 @@
   .ts-chip:hover { filter: brightness(.95); }
   .ts-chip .ts-ct { opacity: .55; font-size: 11px; }
 
+  /* Modo visualização pública (link compartilhado, somente leitura) */
+  .view-banner {
+    display: none; align-items: center; gap: 7px; font-size: 13px; color: var(--text-dim);
+    background: var(--bg-elev); border: 1px solid var(--border); border-radius: var(--radius-sm);
+    padding: 7px 12px; margin-top: 14px;
+  }
+  body.view .view-banner { display: inline-flex; }
+  body.view #addBtn, body.view #importBtn, body.view #shareBtn, body.view #fab { display: none; }
+  body.view .card-actions { display: none; }
+  body.view .status-badge { pointer-events: none; }
+  body.view .card { cursor: default; }
+
   @media (max-width: 560px) {
     .brand h1 { font-size: 32px; }
     .toolbar-right { margin-left: 0; width: 100%; }
@@ -286,6 +330,7 @@
         <h1>remmember<span class="dot">.</span></h1>
         <span class="sub">tudo que você já usa — ou ainda quer testar <span class="count-pill" id="countPill">0 itens</span></span>
       </div>
+      <div class="view-banner">👁️ Visualização pública — somente leitura. Use "Exportar" pra levar esta lista pro seu próprio remmember.</div>
 
       <div class="toolbar">
         <div id="viewTabs" style="display:contents"></div>
@@ -294,6 +339,11 @@
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
             <input id="search" type="text" placeholder="Buscar…" autocomplete="off" />
           </div>
+          <button class="io-btn" id="themeBtn" title="Alternar tema claro/escuro">🌙</button>
+          <button class="io-btn" id="shareBtn" title="Copiar link público (somente leitura)">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+            Compartilhar
+          </button>
           <button class="io-btn" id="exportBtn" title="Baixar backup JSON">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M7 10l5 5 5-5"/><path d="M12 15V3"/></svg>
             Exportar
@@ -456,7 +506,41 @@ function load() {
   localStorage.setItem(STORE_KEY, JSON.stringify(SEED));
   return SEED;
 }
-function save() { localStorage.setItem(STORE_KEY, JSON.stringify(items)); }
+function save() { if (viewMode) return; localStorage.setItem(STORE_KEY, JSON.stringify(items)); }
+
+// ---------- modo visualização pública (link compartilhado) ----------
+const viewMode = location.hash.startsWith('#v=');
+
+// ---------- tema claro/escuro ----------
+const THEME_KEY = 'remmember.theme';
+function applyTheme(t) {
+  document.body.classList.toggle('dark', t === 'dark');
+  const b = document.getElementById('themeBtn');
+  if (b) { b.textContent = t === 'dark' ? '☀️' : '🌙'; b.title = t === 'dark' ? 'Mudar pra tema claro' : 'Mudar pra tema escuro'; }
+}
+let theme = localStorage.getItem(THEME_KEY) ||
+  (window.matchMedia && matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+
+// ---------- link compartilhável (dados comprimidos no hash, nada vai pro servidor) ----------
+async function gzipB64(str) {
+  const stream = new Blob([str]).stream().pipeThrough(new CompressionStream('gzip'));
+  const buf = await new Response(stream).arrayBuffer();
+  const u = new Uint8Array(buf);
+  let s = '';
+  for (let i = 0; i < u.length; i += 0x8000) s += String.fromCharCode.apply(null, u.subarray(i, i + 0x8000));
+  return btoa(s).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+}
+async function gunzipB64(b64) {
+  const bin = atob(b64.replace(/-/g, '+').replace(/_/g, '/'));
+  const u = new Uint8Array(bin.length);
+  for (let i = 0; i < bin.length; i++) u[i] = bin.charCodeAt(i);
+  const stream = new Blob([u]).stream().pipeThrough(new DecompressionStream('gzip'));
+  return new TextDecoder().decode(await new Response(stream).arrayBuffer());
+}
+async function buildShareLink() {
+  const enc = await gzipB64(JSON.stringify(items));
+  return location.origin + location.pathname + '#v=' + enc;
+}
 
 // ---------- helpers ----------
 function normUrl(url) {
@@ -508,13 +592,27 @@ const TAG_COLOR_MAP = {
   'payment': 'green', 'seo': 'yellow', 'social media': 'red',
   'research': 'gray', 'marketing': 'orange',
 };
+// Paleta de multi-select do Notion (dark)
+const NOTION_COLORS_DARK = {
+  gray:    { bg: '#5A5A5A', tx: 'rgba(255,255,255,.88)' },
+  brown:   { bg: '#603B2C', tx: 'rgba(255,255,255,.88)' },
+  orange:  { bg: '#854C1D', tx: 'rgba(255,255,255,.88)' },
+  yellow:  { bg: '#89632A', tx: 'rgba(255,255,255,.88)' },
+  green:   { bg: '#2B593F', tx: 'rgba(255,255,255,.88)' },
+  blue:    { bg: '#28456C', tx: 'rgba(255,255,255,.88)' },
+  purple:  { bg: '#492F64', tx: 'rgba(255,255,255,.88)' },
+  pink:    { bg: '#69314C', tx: 'rgba(255,255,255,.88)' },
+  red:     { bg: '#6E3630', tx: 'rgba(255,255,255,.88)' },
+  default: { bg: 'rgba(255,255,255,.13)', tx: 'rgba(255,255,255,.88)' },
+};
 const PALETTE_KEYS = ['gray', 'brown', 'orange', 'yellow', 'green', 'blue', 'purple', 'pink', 'red'];
 function tagColor(t) {
+  const pal = document.body.classList.contains('dark') ? NOTION_COLORS_DARK : NOTION_COLORS;
   const key = TAG_COLOR_MAP[t.toLowerCase()];
-  if (key) return NOTION_COLORS[key];
+  if (key) return pal[key];
   let h = 0;
   for (let i = 0; i < t.length; i++) h = (h * 31 + t.charCodeAt(i)) >>> 0;
-  return NOTION_COLORS[PALETTE_KEYS[h % PALETTE_KEYS.length]];
+  return pal[PALETTE_KEYS[h % PALETTE_KEYS.length]];
 }
 function pillStyle(t) {
   const c = tagColor(t);
@@ -627,6 +725,7 @@ function renderGrid() {
   });
   // clique no card abre o item (como abrir uma página no Notion)
   grid.querySelectorAll('[data-card]').forEach(c => c.onclick = (e) => {
+    if (viewMode) return;
     if (e.target.closest('a, [data-act], [data-tagclick]')) return;
     openModal(c.dataset.card);
   });
@@ -674,12 +773,14 @@ function cardHtml(it) {
 
 // ---------- actions ----------
 function toggleStatus(id) {
+  if (viewMode) return;
   const it = items.find(i => i.id === id);
   if (!it) return;
   it.status = it.status === 'used' ? 'want' : 'used';
   save(); render();
 }
 function delItem(id) {
+  if (viewMode) return;
   const it = items.find(i => i.id === id);
   if (!confirm(`Excluir "${it ? it.title : 'item'}"?`)) return;
   items = items.filter(i => i.id !== id);
@@ -823,6 +924,25 @@ document.getElementById('search').addEventListener('input', renderGrid);
 document.getElementById('fab').onclick = () => openModal();
 document.getElementById('addBtn').onclick = () => openModal();
 document.getElementById('exportBtn').onclick = exportData;
+document.getElementById('themeBtn').onclick = () => {
+  theme = theme === 'dark' ? 'light' : 'dark';
+  localStorage.setItem(THEME_KEY, theme);
+  applyTheme(theme);
+  render(); // re-renderiza as pills com a paleta do tema
+};
+document.getElementById('shareBtn').onclick = async () => {
+  const btn = document.getElementById('shareBtn');
+  try {
+    const url = await buildShareLink();
+    await navigator.clipboard.writeText(url);
+    const orig = btn.innerHTML;
+    btn.innerHTML = '✓ Link copiado!';
+    setTimeout(() => { btn.innerHTML = orig; }, 2000);
+  } catch (e) {
+    try { prompt('Copie o link público:', await buildShareLink()); }
+    catch (e2) { alert('Não foi possível gerar o link neste navegador.'); }
+  }
+};
 document.getElementById('importBtn').onclick = () => document.getElementById('importFile').click();
 document.getElementById('importFile').onchange = (e) => {
   if (e.target.files[0]) importData(e.target.files[0]);
@@ -845,7 +965,7 @@ document.addEventListener('keydown', e => {
   const overlayOpen = document.getElementById('overlay').classList.contains('show');
   if (e.key === 'Escape' && overlayOpen) closeModal();
   if (e.key === 'Enter' && overlayOpen && (e.metaKey || e.ctrlKey)) saveModal();
-  if (e.key === 'n' && !overlayOpen && document.activeElement.tagName !== 'INPUT' && document.activeElement.tagName !== 'TEXTAREA') {
+  if (e.key === 'n' && !overlayOpen && !viewMode && document.activeElement.tagName !== 'INPUT' && document.activeElement.tagName !== 'TEXTAREA') {
     e.preventDefault(); openModal();
   }
   if (e.key === '/' && document.activeElement.tagName !== 'INPUT' && document.activeElement.tagName !== 'TEXTAREA') {
@@ -853,7 +973,21 @@ document.addEventListener('keydown', e => {
   }
 });
 
-render();
+// ---------- init ----------
+(async () => {
+  applyTheme(theme);
+  if (viewMode) {
+    document.body.classList.add('view');
+    try {
+      const data = JSON.parse(await gunzipB64(location.hash.slice(3)));
+      if (Array.isArray(data) && data.length) items = data;
+    } catch (e) {
+      alert('Link compartilhado inválido — mostrando o vault local.');
+      document.body.classList.remove('view');
+    }
+  }
+  render();
+})();
 </script>
 </body>
 </html>
